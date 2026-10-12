@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "workflow-site",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [".claude/serve.py"],
+      "port": 5173
+    }
+  ]
+}

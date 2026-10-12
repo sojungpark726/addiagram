@@ -1,0 +1,20 @@
+# 비밀 정보
+.env
+.env.*
+
+# 의존성 · 빌드 결과
+node_modules/
+public/
+dist/
+.vercel/
+.wrangler/
+
+# 로컬 설정
+.claude/settings.local.json
+
+# 원본 표 (개인별 실적 시트 포함) · 백업 · 테스트 메모는 저장소에 올리지 않음
+앱디팀_워크플로우.xlsx
+앱디팀_워크플로우.csv
+_backup/
+remote_test.txt
+sample_note.txt
