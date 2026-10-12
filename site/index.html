@@ -1362,8 +1362,10 @@ function initFollower() {
   f.className = 'follower';
   f.innerHTML = '<span class="f-dot"></span><span class="f-ring"></span>';
   document.body.appendChild(f);
-  const vp = $('#viewport');
-  let tx = 0, ty = 0, x = 0, y = 0, raf = 0, last = 0, enterT = 0, leaveT = -1e4;
+  // 히어로는 커서 패턴이 맡고, 그 아래(다이어그램 · 볼륨 측정 · 일정표)에서 마름모 커서가 따라옴
+  const ZONES = '#diagram, #volume, #schedule';
+  const TARGETS = '.node:not(.is-teased):not(.is-hidden), .v-card, .s-card, .stat, .pill-btn, .v-tabs button, .seg button, .pdot';
+  let tx = 0, ty = 0, x = 0, y = 0, raf = 0, last = 0, enterT = 0, leaveT = -1e4, inZone = false;
   const tick = (now) => {
     const dt = Math.min(64, now - last); last = now;
     const k = 1 - Math.exp(-dt / CONFIG.follower.lag);
@@ -1371,22 +1373,16 @@ function initFollower() {
     f.style.transform = `translate3d(${x}px, ${y}px, 0)`;
     raf = Math.abs(tx - x) > 0.2 || Math.abs(ty - y) > 0.2 ? requestAnimationFrame(tick) : 0;
   };
-  vp.addEventListener('pointerenter', (e) => {
-    if (e.pointerType !== 'mouse') return;
-    x = tx = e.clientX; y = ty = e.clientY;
+  const enter = () => {
+    x = tx; y = ty;
     f.style.transform = `translate3d(${x}px, ${y}px, 0)`;
     f.classList.remove('out');
     f.classList.add('on');
     const quick = performance.now() - leaveT < CONFIG.follower.flicker;
     enterT = performance.now();
     if (!quick) { rippleAt(x, y); f.classList.remove('pop'); void f.offsetWidth; f.classList.add('pop'); }
-  });
-  vp.addEventListener('pointermove', (e) => {
-    tx = e.clientX; ty = e.clientY;
-    f.classList.toggle('on-node', !!e.target.closest('.node:not(.is-teased):not(.is-hidden)'));
-    if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
-  });
-  vp.addEventListener('pointerleave', () => {
+  };
+  const leave = () => {
     const quick = performance.now() - enterT < CONFIG.follower.flicker;
     leaveT = performance.now();
     f.classList.remove('on-node', 'pop');
@@ -1394,7 +1390,25 @@ function initFollower() {
     rippleAt(x, y, 'in');
     f.classList.add('out');
     setTimeout(() => { if (f.classList.contains('out')) f.classList.remove('on', 'out'); }, 170);
+  };
+  document.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    tx = e.clientX; ty = e.clientY;
+    const now = !!(e.target.closest && e.target.closest(ZONES));
+    if (now && !inZone) enter();
+    if (!now && inZone) leave();
+    inZone = now;
+    if (!now) return;
+    f.classList.toggle('on-node', !!e.target.closest(TARGETS));
+    if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
   });
+  document.documentElement.addEventListener('pointerleave', () => { if (inZone) { inZone = false; leave(); } });
+  // 스크롤만 해서 영역이 바뀌어도 상태를 맞춤
+  window.addEventListener('scroll', () => {
+    if (!inZone) return;
+    const el = document.elementFromPoint(tx, ty);
+    if (!el || !el.closest(ZONES)) { inZone = false; leave(); }
+  }, { passive: true });
 }
 
 /* ═════════════ 10. 볼륨 측정 ═════════════ */
