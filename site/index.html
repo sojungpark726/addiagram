@@ -357,6 +357,8 @@ const CONFIG = {
   layout: { colW: 162, nodeW: 108, confirmW: 124, phaseGap: 56, labelW: 152, laneCore: 66, lanePad: 28, bandTop: 14 },
   camera: { distanceFactor: 1.5, minDuration: 500, maxDuration: 1000 },
   play: { interval: 2600 },
+  // 반복 단위 띠(빨간 ↻ 글씨)를 그리지 않을 과정
+  hideRepeatBand: ['킥오프'],
   push: { min: 10, max: 24, reach: 40, ease: 140 },
   pattern: { cell: 32, radius: 64, decayPerSec: 0.7, trailMax: 0.38, trailScale: 0.13, waveMax: 0.55, noise: 0.7, diamondRate: 0.05, timers: 3, waveEvery: [700, 2000], waveRadius: [5, 12], waveDur: [1700, 2700], waveSpread: 600, textDim: 0.45, step: 12, maxSteps: 24 },
   follower: { lag: 70, flicker: 300 },
@@ -707,6 +709,7 @@ function render(M) {
     });
     runs(M, (n) => n.phase + '|' + n.unit).forEach((r) => {
       const [x0, x1] = span(r), yy = T + 68, rep = isRepeat(r.nodes[0].unit), name = (rep ? '↻ ' : '') + r.nodes[0].unit;
+      if (rep && CONFIG.hideRepeatBand.includes(r.nodes[0].phase)) return;
       bands.push(`<g class="band-unit${rep ? ' rep' : ''}"><path d="M${x0},${yy + 8}V${yy}H${x1}V${yy + 8}"/><text class="bt" data-x0="${x0}" data-x1="${x1}" data-pad="8" x="${x0 + 8}" y="${yy + 15}">${esc(fit(name, x1 - x0 - 16, 11.5, 500))}<title>${esc(name)}</title></text></g>`);
     });
   } else {
