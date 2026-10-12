@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>OG 이미지 원본 (1200×630)</title>
+<style>
+/* 링크 미리보기 이미지 원본. 히어로와 같은 구성: Pretendard · App Design + i 점 마름모 · 빨강/회색 도형 · 표의 유형 색 */
+@font-face { font-family: "Pretendard Variable"; src: url("../fonts/PretendardVariable.woff2") format("woff2"); font-weight: 45 920; }
+:root { --brand: #ff3b40; --text: #1d1d1f; --text-2: #6e6e73; --g1: #f0f0f3; --g2: #e5e5ea; --g3: #d2d2d7; }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1200px; height: 630px; overflow: hidden; background: #fff; }
+body { position: relative; font-family: "Pretendard Variable", sans-serif; color: var(--text); word-break: keep-all; }
+canvas { position: absolute; inset: 0; }
+.shape { position: absolute; }
+.copy { position: absolute; left: 88px; top: 92px; }
+.eyebrow { font-size: 26px; font-weight: 700; letter-spacing: .04em; color: var(--text-2); }
+h1 { position: relative; margin-top: 18px; font-size: 172px; font-weight: 800; line-height: .95; letter-spacing: -0.055em; white-space: nowrap; }
+.idot { display: inline-block; }
+.idot .bl { display: inline-block; width: 0; height: 0; vertical-align: baseline; }
+.idia { position: absolute; background: var(--brand); transform: rotate(45deg); }
+.lead { margin-top: 22px; font-size: 54px; font-weight: 800; letter-spacing: -0.05em; }
+.flow { position: absolute; left: 88px; bottom: 70px; }
+</style>
+</head>
+<body>
+<canvas id="dots" width="1200" height="630"></canvas>
+
+<!-- 배경 도형: 큰 빨강은 오른쪽 아래 원 · 오른쪽 위 둥근 마름모, 나머지 회색 -->
+<svg class="shape" style="right:-110px;bottom:-190px" width="430" height="430" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#ff3b40"/></svg>
+<svg class="shape" style="right:150px;top:-60px" width="220" height="220" viewBox="0 0 100 100"><rect x="18" y="18" width="64" height="64" rx="12" fill="#ff3b40" transform="rotate(45 50 50)"/></svg>
+<svg class="shape" style="left:-120px;top:-140px" width="300" height="300" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#f0f0f3"/></svg>
+<svg class="shape" style="right:40px;top:250px" width="120" height="120" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#d2d2d7"/></svg>
+<svg class="shape" style="right:330px;bottom:40px;transform:rotate(-18deg)" width="260" height="78" viewBox="0 0 260 78"><rect width="260" height="78" rx="39" fill="#e5e5ea"/></svg>
+<svg class="shape" style="right:470px;top:46px" width="54" height="54" viewBox="0 0 100 100"><rect x="18" y="18" width="64" height="64" rx="12" fill="#ff3b40" transform="rotate(45 50 50)"/></svg>
+
+<div class="copy">
+  <p class="eyebrow">앱디팀 워크플로우</p>
+  <h1 id="title">App Des<span class="idot">ı<span class="bl"></span></span>gn<span class="idia" id="idia"></span></h1>
+  <p class="lead">워크플로우 다이어그램</p>
+</div>
+
+<!-- 작은 흐름 모티프: 표의 유형 색 (회의 · 작업 · 컨펌 · 수정 · 픽스) + 반려 점선 -->
+<svg class="flow" width="620" height="96" viewBox="0 0 620 96" aria-hidden="true">
+  <g fill="none" stroke="#c7c7cc" stroke-width="2.5">
+    <path d="M104 58H128"/><path d="M232 58H256"/><path d="M356 58H380"/><path d="M484 58H508"/>
+  </g>
+  <g fill="#c7c7cc"><path d="M136 58l-9-5v10z"/><path d="M264 58l-9-5v10z"/><path d="M388 58l-9-5v10z"/><path d="M516 58l-9-5v10z"/></g>
+  <path d="M436 36C436 2 306 2 306 17" fill="none" stroke="#ff3b40" stroke-width="2.5" stroke-dasharray="7 6"/>
+  <path d="M306 27l-5.5-10h11z" fill="#ff3b40"/>
+  <rect x="2" y="40" width="100" height="36" rx="18" fill="#DAF2D0" stroke="#99a992" stroke-width="2"/>
+  <rect x="136" y="38" width="96" height="40" rx="8" fill="#D9D9D9" stroke="#989898" stroke-width="2"/>
+  <path d="M306 28L352 58L306 88L260 58Z" fill="#FFFFCC" stroke="#b3b38f" stroke-width="2"/>
+  <rect x="388" y="38" width="96" height="40" rx="8" fill="#D9D9D9" stroke="#989898" stroke-width="2"/>
+  <path d="M520 58L532 38H600L612 58L600 78H532Z" fill="#C0E6F5" stroke="#86a1ac" stroke-width="2"/>
+</svg>
+
+<script>
+// 배경 점 격자 (히어로 커서 패턴과 같은 32px 칸, 고정 시드)
+(function () {
+  const g = document.getElementById('dots').getContext('2d');
+  let s = 20261013;
+  const rnd = () => ((s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+  for (let y = 16; y < 630; y += 32) for (let x = 16; x < 1200; x += 32) {
+    const r = rnd();
+    if (r < 0.55) continue;
+    g.globalAlpha = r > 0.985 ? 0.9 : 0.55;
+    if (r > 0.985) { g.fillStyle = '#ff3b40'; g.beginPath(); g.moveTo(x, y - 6); g.lineTo(x + 6, y); g.lineTo(x, y + 6); g.lineTo(x - 6, y); g.fill(); }
+    else if (r > 0.9) { g.fillStyle = '#d2d2d7'; g.fillRect(x - 5, y - 5, 10, 10); }
+    else { g.fillStyle = '#e8e8ed'; g.beginPath(); g.arc(x, y, 5, 0, Math.PI * 2); g.fill(); }
+  }
+})();
+// i 점 마름모: 'i'와 'ı'를 그려 차이(점)의 중심을 재서 그 자리에 놓음 (사이트와 같은 방법)
+document.fonts.load('800 172px "Pretendard Variable"').then(() => document.fonts.ready).then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))).then(() => {
+  const el = document.querySelector('.idot'), bl = el.querySelector('.bl'), dia = document.getElementById('idia'), host = document.getElementById('title');
+  const cs = getComputedStyle(el), size = parseFloat(cs.fontSize);
+  const W = Math.ceil(size * 1.2), H = Math.ceil(size * 1.6), x0 = Math.round(size * 0.2), base = Math.round(size * 1.2);
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  const draw = (ch) => { g.clearRect(0, 0, W, H); g.font = `${cs.fontWeight} ${size}px ${cs.fontFamily}`; g.fillText(ch, x0, base); return g.getImageData(0, 0, W, H).data; };
+  const a = draw('i'), b = draw('ı');
+  let x1 = W, x2 = -1, y1 = H, y2 = -1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const k = (y * W + x) * 4 + 3; if (a[k] > 128 && b[k] < 40) { x1 = Math.min(x1, x); x2 = Math.max(x2, x); y1 = Math.min(y1, y); y2 = Math.max(y2, y); } }
+  const side = Math.max(size * 0.16, (x2 - x1 + 1) * 0.95);
+  dia.style.width = dia.style.height = side + 'px';
+  dia.style.left = (el.offsetLeft + (x1 + x2 + 1) / 2 - x0 - side / 2) + 'px';
+  dia.style.top = (bl.offsetTop + (y1 + y2 + 1) / 2 - base - side / 2) + 'px';
+  document.body.dataset.ready = '1';
+});
+</script>
+</body>
+</html>

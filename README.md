@@ -44,6 +44,15 @@
    node C:\Users\susan726\Documents\my-first-worker\node_modules\wrangler\bin\wrangler.js deploy
    ```
 
+## 링크 미리보기 (OG)
+
+- 사이트 이름 · 소개글 · 대표 주소는 `scripts/build-site.mjs` 맨 위 `SITE`에 있습니다. 대표 주소는 Vercel(https://addiagram.vercel.app/)이고, Cloudflare 배포도 같은 주소를 가리킵니다.
+- 미리보기 이미지는 `site/og-image.png`(1200×630)이고, 원본은 `site/og/og.html`입니다. 고친 뒤에는 로컬 미리보기 서버(`python .claude/serve.py`)를 켜고 다시 찍습니다.
+
+  ```bash
+  "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --window-size=1200,630 --virtual-time-budget=8000 --screenshot="site\og-image.png" "http://127.0.0.1:5173/og/og.html"
+  ```
+
 ## 로컬에서 보기
 
 ```bash
