@@ -1,4 +1,5 @@
 """워크플로우 표(xlsx, 없으면 csv)를 읽어 site/workflow-data.js를 만든다.
+(워크플로우 · 요약 · 범례 · 볼륨 기준 시트. 개인별 실적 시트는 읽지 않는다.)
 
 사용: python site/build_data.py
 - 표준 라이브러리만 사용한다 (openpyxl 불필요).
@@ -21,6 +22,7 @@ OUT = Path(__file__).resolve().parent / "workflow-data.js"
 WORKFLOW_SHEET = "워크플로우"
 SUMMARY_SHEET = "요약"
 LEGEND_SHEET = "범례·작성 가이드"
+VOLUME_SHEET = "볼륨 기준"
 
 
 def col_index(ref):
@@ -138,12 +140,14 @@ def main():
         payload["summary"] = trim(sheets.get(SUMMARY_SHEET, []))
         payload["legend"] = trim(sheets.get(LEGEND_SHEET, []))
         payload["typeColors"] = type_colors(XLSX, WORKFLOW_SHEET, "유형")
+        payload["volume"] = trim(sheets.get(VOLUME_SHEET, []))
     elif CSV.exists():
         with open(CSV, encoding="utf-8-sig", newline="") as f:
             table = trim(list(csv.reader(f)))
         payload["source"] = {"file": CSV.name, "sheet": None}
         payload["summary"] = []
         payload["legend"] = []
+        payload["volume"] = []
     else:
         sys.exit("워크플로우 표 파일(xlsx 또는 csv)이 없습니다.")
 

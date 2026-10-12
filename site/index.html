@@ -289,6 +289,58 @@ button.stat { font: inherit; text-align: left; cursor: pointer; color: inherit; 
 .role-pick .rp-key .k-fill { background: var(--brand); }
 .role-pick .rp-key .k-ring { border: 2px solid var(--brand); margin-left: 6px; }
 
+/* ── 볼륨 측정 ── */
+.volume { padding-block: 64px 96px; background: var(--bg-gray); }
+.v-h2 { margin: 0; font-size: clamp(30px, 4.1vw, 52px); font-weight: 700; line-height: 1.12; letter-spacing: -0.035em; }
+.v-sub { margin: 14px 0 0; max-width: 62ch; font-size: clamp(16px, 1.6vw, 19px); color: var(--text-2); font-weight: 500; }
+.v-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px; margin-top: 32px; align-items: start; }
+.v-card { min-width: 0; padding: 24px; border-radius: 24px; background: var(--bg-white); }
+.v-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.v-tabs button { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-white); font-size: 14px; font-weight: 600; transition: opacity .2s; }
+.v-tabs button:hover { opacity: .6; }
+.v-tabs button[aria-selected="true"] { background: var(--text); border-color: var(--text); color: #fff; }
+.v-fields { display: grid; gap: 8px; margin-top: 18px; }
+.v-f { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--bg-near); font-size: 14.5px; }
+.v-f.fixed { background: var(--bg-gray); }
+.v-l { min-width: 0; font-weight: 600; }
+.v-l small { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 500; color: var(--text-2); }
+.v-l input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--brand); vertical-align: -2px; margin: 0 4px 0 0; }
+.v-v { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.v-num { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text-2); }
+.v-num input, .v-f select, .v-add input { font: inherit; font-size: 14.5px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-white); color: var(--text); }
+.v-num input { width: 76px; text-align: right; font-variant-numeric: tabular-nums; }
+.v-result { display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: baseline; margin-top: 20px; padding: 16px 18px; border-radius: 16px; background: var(--text); color: #fff; }
+.v-big { font-size: 40px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.v-u { margin-left: 4px; font-size: 16px; font-weight: 600; color: rgba(255, 255, 255, .75); }
+.v-h { margin-left: 10px; font-size: 13.5px; color: rgba(255, 255, 255, .6); }
+.v-lines { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; font-size: 13.5px; }
+.v-lines li { display: grid; grid-template-columns: minmax(0, 1fr) auto 56px; gap: 10px; color: var(--text-2); }
+.v-lines li span:first-child { color: var(--text); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v-lines li span:last-child { text-align: right; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.v-add { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.v-add input { flex: 1 1 180px; min-width: 0; }
+.v-list { margin-top: 18px; border-top: 1px solid var(--shape-gray); padding-top: 14px; }
+.v-list h4 { margin: 0 0 8px; font-size: 15px; }
+.v-list h4 .num { margin-left: 6px; font-weight: 600; color: var(--brand); }
+.v-list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.v-list li { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto 28px; gap: 8px; align-items: center; font-size: 14px; }
+.v-list li > span:first-child { font-size: 12.5px; color: var(--text-2); }
+.v-list li .num { color: var(--text-2); font-variant-numeric: tabular-nums; }
+.v-del, .v-clear { color: var(--text-3); font-size: 13px; transition: opacity .2s; }
+.v-del:hover, .v-clear:hover { opacity: .6; }
+.v-clear { margin-top: 8px; text-decoration: underline; }
+.v-note { margin: 12px 0 0; font-size: 13.5px; color: var(--text-2); }
+.v-crit h3 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.v-crit h4 { margin: 20px 0 8px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--text-2); }
+.v-cap { margin: 6px 0 0; font-size: 14px; color: var(--text-2); }
+.v-steps { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14.5px; }
+.v-dl { margin: 0; display: grid; grid-template-columns: minmax(120px, 44%) minmax(0, 1fr); gap: 6px 14px; font-size: 14.5px; }
+.v-dl dt { font-weight: 600; }
+.v-dl dd { margin: 0; color: var(--text-2); }
+.v-dl dd b { color: var(--text); font-variant-numeric: tabular-nums; }
+.v-rules { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13.5px; color: var(--text-2); }
+.v-src { margin: 14px 0 0; font-size: 12.5px; color: var(--text-3); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
@@ -348,6 +400,16 @@ button.stat { font: inherit; text-align: left; cursor: pointer; color: inherit; 
     </div>
   </section>
 
+  <section class="volume" id="volume" aria-label="볼륨 측정">
+    <div class="wrap">
+      <h2 class="v-h2">볼륨 측정</h2>
+      <p class="v-sub" id="volSub"></p>
+      <div class="v-grid">
+        <div class="v-card" id="volCalc"></div>
+        <div class="v-card v-crit" id="volCriteria"></div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <script src="workflow-data.js"></script>
@@ -1303,6 +1365,196 @@ function initFollower() {
   });
 }
 
+/* ═════════════ 10. 볼륨 측정 ═════════════ */
+/* 숫자는 모두 '볼륨 기준' 시트에서 항목 이름으로 찾아 쓴다. 시트 숫자가 바뀌면 계산도 따라 바뀐다.
+   표에 없는 계산 규칙(2종당 내림, 개수 비례)은 기준서의 '계산 방식'에 따로 밝힌다. */
+const VOL = { rows: [], cat: null, list: [] };
+const VOL_KEY = 'appd-volume-list';
+const vnum = (s) => { const m = String(s ?? '').match(/\d+(?:\.\d+)?/); return m ? parseFloat(m[0]) : null; };
+const vrow = (cat, label) => VOL.rows.find((r) => r[0] === cat && r[1] === label) || null;
+function vpart(row, key) {
+  if (!row || !row[3]) return null;
+  return row[3].split(',').map((s) => s.trim()).find((s) => s.includes(key)) || null;
+}
+const vtail = (part) => { const m = part && part.match(/(\d+(?:\.\d+)?)\s*$/); return m ? parseFloat(m[1]) : null; };
+const vper = (part) => { const m = part && part.match(/(\d+)\s*종당/); return m ? parseInt(m[1], 10) : 1; };
+const vbase = (label) => { const m = label.match(/\((\d+)\s*[개장]\s*기준\)/); return m ? parseInt(m[1], 10) : 1; };
+const r2 = (n) => Math.round(n * 100) / 100;
+
+/* 단위 종류별 입력 칸: [id, 종류, 화면 이름, 볼륨, 덧붙임] */
+function volumeModel() {
+  const M2 = {};
+  const add = (cat, f) => { (M2[cat] = M2[cat] || []).push(f); };
+  const g = (cat, label) => vrow(cat, label);
+  // 인게임
+  let r;
+  if ((r = g('인게임', '기본'))) add('인게임', { id: 'base', kind: 'fixed', label: '기본', v: vnum(r[2]), src: r });
+  if ((r = g('인게임', '화면 전환 또는 배경 2배 이상'))) add('인게임', { id: 'screen', kind: 'check', label: r[1], v: vnum(r[2]), src: r });
+  if ((r = g('인게임', '큰 맵 > 오브젝트 배치'))) {
+    add('인게임', { id: 'bigmap', kind: 'check', label: r[1], v: vnum(r[2]), src: r });
+    const p = vpart(r, '게임 종류');
+    if (p) add('인게임', { id: 'games', kind: 'per', label: '게임 종류', unit: '종', per: vper(p), v: vtail(p), src: r, rule: p });
+  }
+  if ((r = g('인게임', '인게임 팝업 1종당'))) add('인게임', { id: 'popup', kind: 'count', label: '인게임 팝업', unit: '종', v: vnum(r[2]), src: r });
+  if ((r = g('인게임', '인게임 데코 (기본 1종)'))) {
+    add('인게임', { id: 'deco', kind: 'check', label: r[1], v: vnum(r[2]), src: r, def: true });
+    const p = vpart(r, '카테고리 추가');
+    if (p) add('인게임', { id: 'decoAdd', kind: 'per', label: '데코 카테고리 추가', unit: '종', per: vper(p), v: vtail(p), src: r, rule: p });
+  }
+  if ((r = g('인게임', '인게임 인트로·엔딩'))) {
+    const p = vpart(r, '스파인');
+    add('인게임', { id: 'intro', kind: 'select', label: r[1], src: r, options: [['없음', 0], ['있음', vnum(r[2])]].concat(p ? [['동일 배경에 스파인만 변경', vtail(p)]] : []) });
+  }
+  if ((r = g('인게임', '인게임 캐릭터'))) {
+    const p = vpart(r, '추가');
+    if (p) add('인게임', { id: 'chars', kind: 'per', label: '캐릭터 추가 (기본 2종 외, 단순 엑스트라 제외)', unit: '종', per: vper(p), v: vtail(p), src: r, rule: p });
+  }
+  // 보상
+  if ((r = g('보상', '테마 + 스티커바 1종'))) {
+    add('보상', { id: 'theme', kind: 'count', label: '테마 + 스티커바', unit: '종', v: vnum(r[2]), src: r, def: 1 });
+    const p1 = vpart(r, '1.5배'), p2 = vpart(r, '2배 이상');
+    add('보상', { id: 'bg', kind: 'select', label: '배경 크기', src: r, options: [['기본', 0]].concat(p1 ? [['1.5배', vtail(p1)]] : [], p2 ? [['2배 이상', vtail(p2)]] : []) });
+  }
+  // 콘선화
+  const forms = VOL.rows.filter((x) => x[0] === '콘선화');
+  if (forms.length) add('콘선화', { id: 'form', kind: 'select', label: '형식', src: forms[0], options: forms.map((x) => [x[1], vnum(x[2])]) });
+  // 홈·스플래시
+  VOL.rows.filter((x) => x[0] === '홈·스플래시').forEach((x, i) => add('홈·스플래시', { id: 'home' + i, kind: 'fixed', label: x[1], v: vnum(x[2]), src: x }));
+  // 홍보물: 합계 줄을 뺀 항목을 각각 고름
+  VOL.rows.filter((x) => x[0] === '홍보물' && x[1] !== '합계').forEach((x, i) => add('홍보물', { id: 'promo' + i, kind: 'check', label: x[1], v: vnum(x[2]), src: x, def: true }));
+  // 기타
+  VOL.rows.filter((x) => x[0] === '기타').forEach((x, i) => {
+    const base = vbase(x[1]);
+    if (base > 1) add('기타', { id: 'etc' + i, kind: 'ratio', label: x[1].replace(/\s*\(.*\)/, ''), unit: /장/.test(x[1]) ? '장' : '개', base, v: vnum(x[2]), src: x });
+    else add('기타', { id: 'etc' + i, kind: 'count', label: x[1].replace(/\s*1개당/, ''), unit: '개', v: vnum(x[2]), src: x });
+  });
+  // 공통 배수 (모든 단위)
+  const mult = VOL.rows.find((x) => x[0] === '공통' && /×/.test(x[2] || ''));
+  return { cats: Object.keys(M2), fields: M2, mult: mult ? { label: mult[1], v: vnum(mult[2]), note: mult[3], src: mult } : null };
+}
+function volumeConv() {
+  const r = VOL.rows.find((x) => x[0] === '환산');
+  const dayPerVol = r ? vnum(r[2]) / vnum(r[1]) : 5;
+  const hp = r && r[3] ? r[3].match(/1시간\s*=\s*(\d+(?:\.\d+)?)일/) : null;
+  return { dayPerVol, dayPerHour: hp ? parseFloat(hp[1]) : null, row: r };
+}
+
+function volumeCalc(model, cat, state) {
+  const lines = [];
+  let total = 0;
+  (model.fields[cat] || []).forEach((f) => {
+    const s = state[f.id];
+    let v = 0, text = '';
+    if (f.kind === 'fixed') { v = f.v; text = '기본 포함'; }
+    else if (f.kind === 'check') { v = s ? f.v : 0; text = s ? '포함' : ''; }
+    else if (f.kind === 'count') { const n = +s || 0; v = n * f.v; text = n ? `${n}${f.unit} × ${f.v}` : ''; }
+    else if (f.kind === 'per') { const n = +s || 0; const k = Math.floor(n / f.per); v = k * f.v; text = n ? `${n}${f.unit} → ${f.per}${f.unit}마다 ${f.v} × ${k}` : ''; }
+    else if (f.kind === 'ratio') { const n = +s || 0; v = (n / f.base) * f.v; text = n ? `${n}${f.unit} ÷ ${f.base} × ${f.v}` : ''; }
+    else if (f.kind === 'select') { const o = f.options[+s || 0]; v = o ? o[1] : 0; text = o && o[1] ? o[0] : ''; }
+    if (v) lines.push([f.label, text, v]);
+    total += v;
+  });
+  if (model.mult && state.__mult) { lines.push([model.mult.label, `합계 × ${model.mult.v}`, total * (model.mult.v - 1)]); total *= model.mult.v; }
+  return { total: r2(total), lines };
+}
+
+function initVolume() {
+  VOL.rows = (DATA.volume || []).slice(1).map((r) => r.map((c) => (c || '').trim()));
+  const box = $('#volCalc');
+  if (!VOL.rows.length) { box.innerHTML = '<p class="v-note">표에 ‘볼륨 기준’ 시트가 없습니다.</p>'; return; }
+  const model = volumeModel(), conv = volumeConv();
+  const t01 = M && M.tasks.find((t) => t.name === '볼륨 책정 회의');
+  $('#volSub').textContent = `표의 ‘볼륨 기준’ 시트로 단위 하나의 디자인 볼륨과 예상일을 계산합니다.${t01 ? ` ${t01.id} ${t01.name}에서 쓰세요.` : ''} 숫자는 모두 시트에서 가져옵니다.`;
+  try { VOL.list = JSON.parse(localStorage.getItem(VOL_KEY) || '[]'); } catch (e) { VOL.list = []; }
+  VOL.cat = model.cats[0];
+  const state = {};
+  const fieldHTML = (f) => {
+    const id = `v_${f.id}`;
+    const hint = f.rule ? `<small>${esc(f.rule)}</small>` : f.src && f.src[3] && f.kind !== 'select' ? `<small>${esc(f.src[3])}</small>` : '';
+    if (f.kind === 'fixed') return `<div class="v-f fixed"><span class="v-l">${esc(f.label)}${hint}</span><span class="v-v">${esc(f.src ? f.src[2] : f.v)}</span></div>`;
+    if (f.kind === 'check') return `<label class="v-f" for="${id}"><span class="v-l"><input type="checkbox" id="${id}" data-f="${f.id}"${state[f.id] ? ' checked' : ''}> ${esc(f.label)}${hint}</span><span class="v-v">${esc(f.src && f.src[1] === f.label ? f.src[2] : f.v)}</span></label>`;
+    if (f.kind === 'select') return `<div class="v-f"><label class="v-l" for="${id}">${esc(f.label)}${f.src && f.src[3] ? `<small>${esc(f.src[3])}</small>` : ''}</label><select id="${id}" data-f="${f.id}">${f.options.map((o, i) => `<option value="${i}"${+state[f.id] === i ? ' selected' : ''}>${esc(o[0])}${o[1] ? ` (${o[1]})` : ''}</option>`).join('')}</select></div>`;
+    const per = f.kind === 'per' ? `${f.per}${f.unit}마다 ${f.v}` : f.kind === 'ratio' ? `${f.base}${f.unit} 기준 ${f.v}` : `1${f.unit}당 ${f.v}`;
+    return `<div class="v-f"><label class="v-l" for="${id}">${esc(f.label)}<small>${esc(per)}${f.kind !== 'per' && f.src && f.src[3] ? ' · ' + esc(f.src[3]) : ''}</small></label><span class="v-num"><input type="number" min="0" step="1" inputmode="numeric" id="${id}" data-f="${f.id}" value="${state[f.id] ?? ''}" placeholder="0"> ${esc(f.unit)}</span></div>`;
+  };
+  const resetState = () => {
+    Object.keys(state).forEach((k) => delete state[k]);
+    (model.fields[VOL.cat] || []).forEach((f) => { if (f.def !== undefined) state[f.id] = f.def; });
+  };
+  const render = () => {
+    const res = volumeCalc(model, VOL.cat, state);
+    const days = res.total * conv.dayPerVol;
+    const promoSum = VOL.cat === '홍보물' ? vrow('홍보물', '합계') : null;
+    box.innerHTML = `<div class="v-tabs" role="tablist" aria-label="단위 종류">${model.cats.map((c) => `<button type="button" role="tab" aria-selected="${c === VOL.cat}" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+      <div class="v-fields">${(model.fields[VOL.cat] || []).map(fieldHTML).join('')}
+      ${model.mult ? `<label class="v-f" for="v_mult"><span class="v-l"><input type="checkbox" id="v_mult" data-f="__mult"${state.__mult ? ' checked' : ''}> ${esc(model.mult.label)}<small>공통 · ${esc(model.mult.note || '')}</small></span><span class="v-v">×${model.mult.v}</span></label>` : ''}</div>
+      <div class="v-result" aria-live="polite"><div><span class="v-big">${res.total}</span><span class="v-u">볼륨</span></div><div><span class="v-big">${r2(days)}</span><span class="v-u">일</span>${conv.dayPerHour ? `<span class="v-h">약 ${Math.round(days / conv.dayPerHour)}시간</span>` : ''}</div></div>
+      ${res.lines.length ? `<ul class="v-lines">${res.lines.map(([l, t, v]) => `<li><span>${esc(l)}</span><span>${esc(t)}</span><span>+${r2(v)}</span></li>`).join('')}</ul>` : ''}
+      ${promoSum ? `<p class="v-note">기준 시트의 홍보물 합계는 ${esc(promoSum[2])}입니다. 네 항목을 모두 고르면 같은 값이 됩니다.</p>` : ''}
+      <div class="v-add"><input type="text" id="v_name" placeholder="${esc(VOL.cat)} 단위 이름 (예: 화장실)" aria-label="단위 이름"><button type="button" class="pill-btn" id="v_addBtn">목록에 추가</button></div>
+      ${listHTML()}`;
+  };
+  const listHTML = () => {
+    if (!VOL.list.length) return '<p class="v-note">단위를 계산해 목록에 추가하면 프로젝트 합계가 여기에 나옵니다.</p>';
+    const sum = r2(VOL.list.reduce((s, x) => s + x.volume, 0));
+    return `<div class="v-list"><h4>프로젝트 목록 <span class="num">${VOL.list.length}개 · ${sum} 볼륨 · ${r2(sum * conv.dayPerVol)}일</span></h4><ul>${VOL.list.map((x, i) => `<li><span>${esc(x.cat)}</span><b>${esc(x.name)}</b><span class="num">${x.volume} · ${r2(x.volume * conv.dayPerVol)}일</span><button type="button" class="v-del" data-del="${i}" aria-label="${esc(x.name)} 지우기">✕</button></li>`).join('')}</ul><button type="button" class="v-clear" id="v_clear">목록 비우기</button></div>`;
+  };
+  const save = () => { try { localStorage.setItem(VOL_KEY, JSON.stringify(VOL.list)); } catch (e) { /* 저장 불가 환경 */ } };
+  box.addEventListener('click', (e) => {
+    const tab = e.target.closest('[data-cat]');
+    if (tab) { VOL.cat = tab.dataset.cat; resetState(); render(); box.querySelector(`[data-cat="${CSS.escape(VOL.cat)}"]`).focus(); return; }
+    if (e.target.closest('#v_addBtn')) {
+      const res = volumeCalc(model, VOL.cat, state);
+      const name = $('#v_name').value.trim() || `${VOL.cat} ${VOL.list.filter((x) => x.cat === VOL.cat).length + 1}`;
+      VOL.list.push({ cat: VOL.cat, name, volume: res.total });
+      save(); render(); return;
+    }
+    const del = e.target.closest('[data-del]');
+    if (del) { VOL.list.splice(+del.dataset.del, 1); save(); render(); return; }
+    if (e.target.closest('#v_clear')) { VOL.list = []; save(); render(); }
+  });
+  box.addEventListener('input', (e) => {
+    const el = e.target.closest('[data-f]');
+    if (!el) return;
+    state[el.dataset.f] = el.type === 'checkbox' ? el.checked : el.value;
+    const focusId = el.id, pos = el.selectionStart;
+    render();
+    const again = document.getElementById(focusId);
+    if (again) { again.focus(); try { if (pos != null) again.setSelectionRange(pos, pos); } catch (err) { /* number 입력은 커서 위치 없음 */ } }
+  });
+  resetState();
+  render();
+  renderVolumeCriteria(model, conv);
+}
+
+function renderVolumeCriteria(model, conv) {
+  const cats = [];
+  VOL.rows.forEach((r) => { if (!['환산', '출처'].includes(r[0]) && !cats.includes(r[0])) cats.push(r[0]); });
+  const scope = VOL.rows.find((r) => r[0] === '공통' && r[1] === '포함 범위');
+  const src = VOL.rows.find((r) => r[0] === '출처');
+  const perRules = [];
+  Object.values(model.fields).flat().forEach((f) => { if (f.kind === 'per' && !perRules.includes(f.rule)) perRules.push(f.rule); });
+  $('#volCriteria').innerHTML = `<h3>볼륨 측정 기준</h3>
+    <p class="v-cap">‘볼륨 기준’ 시트를 그대로 옮겼습니다. 볼륨은 디자인 결과물(화면 · 배경 · 팝업 · 데코 · 캐릭터 등) 기준으로 셉니다.</p>
+    <h4>측정 순서</h4>
+    <ol class="v-steps">
+      <li>단위 종류를 고릅니다 (${esc(cats.filter((c) => c !== '공통').join(' · '))}).</li>
+      <li>기본 볼륨에서 시작합니다. 인게임은 기본 ${esc((vrow('인게임', '기본') || [])[2] || '')}, 콘선화는 형식에 따라, 홈·스플래시는 고정값입니다.</li>
+      <li>해당하는 디자인 요소를 더합니다 (+ 항목, 1종당 · 2종당 항목).</li>
+      <li>일러스트형 · 실사형이면 합계에 ${esc((model.mult || {}).v ?? '')}배를 곱합니다 (${esc((model.mult || {}).note || '')}).</li>
+      <li>일수로 바꿉니다: ${esc(conv.row ? `${conv.row[1]} = ${conv.row[2]}` : '')}${conv.row && conv.row[3] ? ` (${esc(conv.row[3])})` : ''}.</li>
+    </ol>
+    ${cats.map((c) => `<h4>${esc(c)}</h4><dl class="v-dl">${VOL.rows.filter((r) => r[0] === c).map((r) => `<dt>${esc(r[1])}</dt><dd><b>${esc(r[2] || '')}</b>${r[3] ? ` · ${esc(r[3])}` : ''}</dd>`).join('')}</dl>`).join('')}
+    <h4>계산 방식 (표에 없는 부분)</h4>
+    <ul class="v-rules">
+      ${perRules.length ? `<li>‘2종당’처럼 묶음으로 적힌 항목은 묶음이 찰 때마다 더하고, 남는 수는 더하지 않습니다 (${esc(perRules.join(' / '))}). 표에 나머지 처리 규칙이 없어 이렇게 계산했습니다.</li>` : ''}
+      <li>‘100개 기준’, ‘3장 기준’ 항목은 개수에 비례해 계산합니다.</li>
+      <li>홍보물은 합계 대신 항목별로 골라 더합니다. 네 항목을 모두 고르면 시트의 합계와 같습니다.</li>
+    </ul>
+    ${scope ? `<p class="v-note"><b>포함 범위</b> · ${esc(scope[3])}</p>` : ''}
+    ${src ? `<p class="v-src">출처: ${esc(src[1])}</p>` : ''}`;
+}
+
 /* ═════════════ 9. 조립 ═════════════ */
 function sizeDiagram() {
   const ov = S.zoom === 'overview';
@@ -1569,7 +1821,7 @@ if (!DATA) {
   $('#scroller').innerHTML = '<p class="empty-note">workflow-data.js를 불러오지 못했습니다. site/build_data.py를 실행해 데이터 파일을 만든 뒤 다시 열어 주세요.</p>';
 } else {
   wire();
-  const go = () => { placeIDots(); mount(DATA.header, DATA.rows, DATA.source.file); initPattern(); initPush(); initFollower(); };
+  const go = () => { placeIDots(); mount(DATA.header, DATA.rows, DATA.source.file); initVolume(); initPattern(); initPush(); initFollower(); };
   const timeout = new Promise((r) => setTimeout(r, 1500));
   Promise.race([document.fonts.load('600 12.5px "Pretendard Variable"').then(() => document.fonts.ready), timeout]).then(go, go);
 }
