@@ -302,6 +302,18 @@ button.stat { font: inherit; text-align: left; cursor: pointer; color: inherit; 
 .s-card p { margin: 10px 0 0; font-size: 15px; color: var(--text-2); }
 .s-tag { margin: 0 !important; display: inline-block; padding: 3px 12px; border-radius: 999px; background: var(--text); color: #fff !important; font-size: 13px !important; font-weight: 700; }
 .s-big { margin-top: 16px !important; font-size: clamp(30px, 4vw, 44px) !important; font-weight: 800; letter-spacing: -0.035em; color: var(--text) !important; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.s-ex-cap { margin-top: 22px !important; font-size: 13px !important; font-weight: 700; color: var(--text-2); letter-spacing: .02em; }
+.s-tbl { margin-top: 8px; overflow-x: auto; border-radius: 14px; background: var(--bg-white); }
+.s-tbl table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.s-tbl th, .s-tbl td { padding: 8px 12px; border-bottom: 1px solid var(--shape-light); text-align: left; white-space: nowrap; }
+.s-tbl thead th { font-size: 12.5px; font-weight: 700; color: var(--text-2); background: var(--bg-near); }
+.s-tbl .num { text-align: right; }
+.s-tbl tbody th { font-weight: 700; vertical-align: top; }
+.s-tbl tbody th small { display: block; font-size: 12px; font-weight: 500; color: var(--text-2); }
+.s-tbl tr.day > * { border-top: 2px solid var(--shape-gray); }
+.s-tbl tr.pick td { background: rgba(255, 59, 64, .07); }
+.s-tbl tr.pick td:nth-child(2) { font-weight: 700; color: var(--brand); }
+.s-tbl tfoot th, .s-tbl tfoot td { border-bottom: 0; font-weight: 700; }
 .v-h2 { margin: 0; font-size: clamp(30px, 4.1vw, 52px); font-weight: 700; line-height: 1.12; letter-spacing: -0.035em; }
 .v-sub { margin: 14px 0 0; max-width: 62ch; font-size: clamp(16px, 1.6vw, 19px); color: var(--text-2); font-weight: 500; }
 .v-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px; margin-top: 32px; align-items: start; }
@@ -1584,13 +1596,41 @@ function initSchedule() {
   const conv = volumeConv();
   const hoursPerDay = Math.round(1 / (conv.dayPerHour || 0.125));
   const r2s = (n) => Math.round(n * 100) / 100;
-  const exVol = 0.8, exDays = r2s(exVol * conv.dayPerVol), exHours = r2s(exDays * hoursPerDay);
-  $('#schSub').textContent = '디자인 일정은 볼륨을 예상일로, 예상일을 시간으로 바꿔 씁니다.';
+  const tn = (name) => (M && M.tasks.find((t) => t.name === name) ? name : null);
+  // 예시 1: 앱 종합 스케쥴표 (가상 프로젝트, 볼륨은 볼륨 기준 시트 값으로 맞춘 가상 단위)
+  const plan = [
+    ['홈·스플래시', '스플래시, 홈', 0.3], ['콘선화', '콘선화 (맵 형식)', 1.0], ['인게임', '인게임 A', 0.8],
+    ['인게임', '인게임 B', 1.2], ['보상', '보상', 0.4], ['홍보물', '홍보물', 0.7],
+  ];
+  const planTotal = r2s(plan.reduce((s, r) => s + r[2], 0));
+  // 예시 2: 일일 일정표 (인게임 A의 예상일을 하루 8시간씩 나눔, 작업 이름은 워크플로우 표)
+  const unitA = plan[2];
+  const daysA = r2s(unitA[2] * conv.dayPerVol), hoursA = r2s(daysA * hoursPerDay);
+  const daily = [
+    [1, [['기획서 사전확인', 1], ['기획전달 회의', 1], ['1차 디자인', 6]]],
+    [2, [['1차 디자인', 4], ['내부 컨펌', 1], ['디자인 수정', 3]]],
+    [3, [['기획 컨펌', 1], ['스파인용 디자인 정리', 2], ['1차 스파인', 5]]],
+    [4, [['스파인 수정', 3], ['jpg 추출', 1], ['리소스 가이드 작성', 1], ['썸네일 제작', 3]]],
+  ].map(([d, items]) => [d, items.filter(([n]) => tn(n))]);
+  const dailyTotal = daily.reduce((s, [, items]) => s + items.reduce((a, [, h]) => a + h, 0), 0);
+  $('#schSub').textContent = '디자인 일정은 볼륨을 예상일로, 예상일을 시간으로 바꿔 씁니다. 아래 표는 이해를 돕기 위한 가상 예시입니다.';
   $('#schBody').innerHTML = `<div class="s-two">
     <article class="s-card"><p class="s-tag">1 · 앱 종합 스케쥴표</p><p class="s-big">볼륨 1 = ${r2s(conv.dayPerVol)}일</p>
-      <p>볼륨을 예상일로 바꿔 씁니다. 예: 볼륨 ${exVol} → 예상 ${exDays}일</p></article>
+      <p>볼륨을 예상일로 바꿔 씁니다. 예: 볼륨 ${unitA[2]} → 예상 ${daysA}일</p>
+      <p class="s-ex-cap">예시 · 가상 프로젝트</p>
+      <div class="s-tbl"><table>
+        <thead><tr><th scope="col">단위 구분</th><th scope="col">단위명</th><th scope="col" class="num">디자인 볼륨</th><th scope="col" class="num">예상일 (× ${r2s(conv.dayPerVol)})</th></tr></thead>
+        <tbody>${plan.map(([c, n, v]) => `<tr${n === unitA[1] ? ' class="pick"' : ''}><td>${esc(c)}</td><td>${esc(n)}</td><td class="num">${v}</td><td class="num">${r2s(v * conv.dayPerVol)}일</td></tr>`).join('')}</tbody>
+        <tfoot><tr><th scope="row" colspan="2">합계</th><td class="num">${planTotal}</td><td class="num">${r2s(planTotal * conv.dayPerVol)}일</td></tr></tfoot>
+      </table></div></article>
     <article class="s-card"><p class="s-tag">2 · 일일 일정표</p><p class="s-big">예상일 1일 = ${hoursPerDay}시간</p>
-      <p>예상일을 시간으로 잡아 작성합니다. 예: 예상 ${exDays}일 → ${exHours}시간</p></article>
+      <p>예상일을 시간으로 잡아 작성합니다. 예: ${esc(unitA[1])} 예상 ${daysA}일 → ${hoursA}시간</p>
+      <p class="s-ex-cap">예시 · ${esc(unitA[1])}의 ${daysA}일을 하루 ${hoursPerDay}시간씩</p>
+      <div class="s-tbl"><table>
+        <thead><tr><th scope="col">날짜</th><th scope="col">단위</th><th scope="col">작업 (워크플로우)</th><th scope="col" class="num">시간</th></tr></thead>
+        <tbody>${daily.map(([d, items]) => items.map(([n, h], i) => `<tr${i === 0 ? ' class="day"' : ''}>${i === 0 ? `<th scope="row" rowspan="${items.length}">${d}일차<small>${items.reduce((a, [, x]) => a + x, 0)}시간</small></th>` : ''}<td>${esc(unitA[1])}</td><td>${esc(n)}</td><td class="num">${h}</td></tr>`).join('')).join('')}</tbody>
+        <tfoot><tr><th scope="row" colspan="3">합계</th><td class="num">${dailyTotal}시간 = ${r2s(dailyTotal / hoursPerDay)}일</td></tr></tfoot>
+      </table></div></article>
   </div>`;
 }
 
