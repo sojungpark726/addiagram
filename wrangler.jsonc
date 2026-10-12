@@ -1,0 +1,13 @@
+{
+  // Worker 코드 없이 public/의 정적 파일만 배포
+  "name": "addiagram",
+  "compatibility_date": "2026-10-12",
+  "workers_dev": true,
+  "build": {
+    // Windows에서는 cmd로 실행되므로 rm·cp 같은 sh 명령 대신 Node 스크립트를 씀
+    "command": "node scripts/build-site.mjs"
+  },
+  "assets": {
+    "directory": "./public/"
+  }
+}
