@@ -385,7 +385,6 @@ button.stat { font: inherit; text-align: left; cursor: pointer; color: inherit; 
     <canvas class="pattern" id="pattern" aria-hidden="true"></canvas>
     <div class="shapes" id="shapes" aria-hidden="true"></div>
     <div class="wrap hero-inner" id="heroInner">
-      <p class="eyebrow" id="heroEyebrow"></p>
       <h1 class="display" id="heroTitle" aria-label="App Design"></h1>
       <p class="lead">워크플로우</p>
       <ul class="stats" id="stats" aria-label="표에서 센 숫자"></ul>
@@ -1097,8 +1096,6 @@ function renderLegend() {
 
 /* ═════════════ 8. 히어로 ═════════════ */
 function renderHero() {
-  const file = M.sourceFile || DATA.source.file;
-  $('#heroEyebrow').textContent = file.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
   const stats = [
     [M.tasks.length, '작업', null],
     [M.phases.length, '과정', 'phase'],
