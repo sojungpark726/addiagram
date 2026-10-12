@@ -296,41 +296,12 @@ button.stat { font: inherit; text-align: left; cursor: pointer; color: inherit; 
 .volume { padding-block: 64px 96px; background: var(--bg-gray); }
 /* ── 일정표 기준 ── */
 .sched { padding-block: 64px 96px; background: var(--bg-white); }
-#schBody { display: grid; gap: 16px; margin-top: 32px; }
-.s-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; align-items: start; }
-.s-card { min-width: 0; padding: 24px; border-radius: 24px; background: var(--bg-gray); }
-.s-card h3 { margin: 4px 0 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
-.s-card p { margin: 8px 0 0; font-size: 14.5px; color: var(--text-2); }
-.s-card ul { margin: 12px 0 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14.5px; }
-.s-card ul b { color: var(--text); }
-.s-tag { margin: 0 !important; display: inline-block; padding: 2px 10px; border-radius: 999px; background: var(--text); color: #fff !important; font-size: 12px !important; font-weight: 700; }
-.s-rule { margin: 0; padding: 12px 16px; border-radius: 14px; border: 1px dashed var(--line); font-size: 14px; color: var(--text-2); }
-.s-flow { display: grid; grid-template-columns: repeat(3, auto) 24px repeat(3, auto) 24px auto; align-items: center; justify-content: start; gap: 10px; overflow-x: auto; padding: 4px 0; }
-.s-node { padding: 12px 16px; border-radius: 14px; border: 1.5px solid var(--line); font-size: 15px; font-weight: 700; white-space: nowrap; }
-.s-node small { display: block; font-size: 12px; font-weight: 500; color: var(--text-2); }
-.s-node.hot { border-color: var(--brand); color: var(--brand); }
-.s-arrow { font-size: 13px; font-weight: 600; color: var(--text-2); white-space: nowrap; }
-.s-arrow::after { content: " →"; color: var(--text-3); }
-@media (max-width: 900px) { .s-flow { grid-template-columns: auto auto auto; } .s-gap { display: none; } }
-.s-ex { background: var(--bg-white); border: 1px solid var(--shape-gray); }
-.s-ex input[type="number"] { width: 72px; font: inherit; font-size: 14.5px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 8px; text-align: right; font-variant-numeric: tabular-nums; background: var(--bg-white); color: var(--text); }
-.s-pull { margin-left: 8px; padding: 4px 12px; font-size: 13px; }
-.s-tbl { margin-top: 14px; overflow-x: auto; }
-.s-tbl table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
-.s-tbl th, .s-tbl td { padding: 8px 10px; border-bottom: 1px solid var(--shape-light); text-align: left; white-space: nowrap; }
-.s-tbl thead th { font-size: 13px; color: var(--text-2); font-weight: 700; }
-.s-tbl tbody th { font-weight: 600; }
-.s-tbl td.num { text-align: right; }
-.s-tbl td.muted { color: var(--text-3); }
-.s-tbl td.memo { color: var(--text-2); white-space: normal; min-width: 200px; }
-.s-tbl tfoot th, .s-tbl tfoot td { border-bottom: 0; font-weight: 700; }
-.s-result { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 16px; }
-.s-result > div { padding: 14px 16px; border-radius: 14px; background: var(--text); color: #fff; display: grid; gap: 2px; }
-.s-result > div.over { background: var(--brand); }
-.s-k { font-size: 12.5px; color: rgba(255, 255, 255, .7); font-weight: 600; }
-.s-v { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
-.s-v small { font-size: 15px; margin-left: 2px; font-weight: 600; }
-.s-f { font-size: 12.5px; color: rgba(255, 255, 255, .75); }
+#schBody { margin-top: 32px; }
+.s-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 16px; }
+.s-card { min-width: 0; padding: 28px; border-radius: 24px; background: var(--bg-gray); }
+.s-card p { margin: 10px 0 0; font-size: 15px; color: var(--text-2); }
+.s-tag { margin: 0 !important; display: inline-block; padding: 3px 12px; border-radius: 999px; background: var(--text); color: #fff !important; font-size: 13px !important; font-weight: 700; }
+.s-big { margin-top: 16px !important; font-size: clamp(30px, 4vw, 44px) !important; font-weight: 800; letter-spacing: -0.035em; color: var(--text) !important; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .v-h2 { margin: 0; font-size: clamp(30px, 4.1vw, 52px); font-weight: 700; line-height: 1.12; letter-spacing: -0.035em; }
 .v-sub { margin: 14px 0 0; max-width: 62ch; font-size: clamp(16px, 1.6vw, 19px); color: var(--text-2); font-weight: 500; }
 .v-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 16px; margin-top: 32px; align-items: start; }
@@ -1535,7 +1506,6 @@ function initVolume() {
   };
   const render = () => {
     const res = volumeCalc(model, VOL.cat, state);
-    VOL.lastTotal = res.total;
     const days = res.total * conv.dayPerVol;
     const promoSum = VOL.cat === '홍보물' ? vrow('홍보물', '합계') : null;
     box.innerHTML = `<div class="v-tabs" role="tablist" aria-label="단위 종류">${model.cats.map((c) => `<button type="button" role="tab" aria-selected="${c === VOL.cat}" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div>
@@ -1609,123 +1579,19 @@ function renderVolumeCriteria(model, conv) {
 }
 
 /* ═════════════ 11. 일정표 기준 ═════════════ */
-/* 규칙은 표에서: 실적 시트 출처 줄(예상일 = 볼륨 × 5, 투입일 = 일일 일정표 실제 투입 합계),
-   볼륨 기준 시트 환산(0.1 볼륨 = 0.5일, 1시간 = 0.125일). 예시의 시간은 설명용 가상 숫자. */
-const SCH = { volume: 1.0, days: null };
+/* 두 가지만: 앱 종합 스케쥴표(볼륨 → 예상일), 일일 일정표(예상일 → 시간). 숫자는 볼륨 기준 시트의 환산에서 가져옴 */
 function initSchedule() {
-  const info = DATA.schedule || {};
   const conv = volumeConv();
-  const perHour = conv.dayPerHour || 0.125;
-  const hoursPerDay = Math.round(1 / perHour);
-  const legendSrc = (DATA.legend || []).find((r) => (r[0] || '').trim() === '출처');
-  const volSrc = VOL.rows.find((r) => r[0] === '출처');
-  const task = (name) => M && M.tasks.find((t) => t.name === name);
-  const tn = (name) => { const t = task(name); return t ? `${t.name}` : name; };
-  const t01 = task('볼륨 책정 회의');
-  $('#schSub').textContent = '디자인 일정은 두 표로 봅니다. 예상은 앱 종합 스케쥴의 볼륨으로, 실제는 앱디 일일 일정표에 적은 시간으로 셉니다. 아래 예시의 시간은 설명을 위한 가상 숫자입니다.';
-  const rule = info.note ? info.note.replace(/^출처:\s*/, '') : '';
-  // 예시: 가상의 인게임 단위 A의 5일 (작업 이름은 워크플로우 표에서)
-  SCH.days = SCH.days || [
-    { a: 8, other: 0, memo: `${tn('기획전달 회의')} · ${tn('1차 디자인')}` },
-    { a: 6, other: 2, memo: `${tn('1차 디자인')} · ${tn('내부 컨펌')}` },
-    { a: 8, other: 0, memo: `${tn('디자인 수정')} · ${tn('1차 스파인')}` },
-    { a: 4, other: 4, memo: `${tn('스파인 수정')} (오후는 다른 단위)` },
-    { a: 7, other: 1, memo: `${tn('jpg 추출')} · ${tn('썸네일 제작')}` },
-  ];
-  const r3 = (n) => Math.round(n * 1000) / 1000;
-  const body = $('#schBody');
-  const draw = () => {
-    const hours = SCH.days.reduce((s, d) => s + (+d.a || 0), 0);
-    const used = r3(hours * perHour);
-    const expected = r3((+SCH.volume || 0) * conv.dayPerVol);
-    const ratio = expected ? used / expected : 0;
-    const diff = r3(used - expected);
-    body.querySelector('#schRows').innerHTML = SCH.days.map((d, i) => `<tr><th scope="row">${i + 1}일차</th>
-      <td><input type="number" min="0" max="24" step="0.5" inputmode="decimal" id="sch_a${i}" data-day="${i}" value="${d.a}" aria-label="${i + 1}일차 단위 A 시간"> 시간</td>
-      <td class="num">${r3((+d.a || 0) * perHour)}일</td><td class="muted">${d.other ? `${d.other}시간 (A에 넣지 않음)` : '–'}</td><td class="memo">${esc(d.memo)}</td></tr>`).join('');
-    body.querySelector('#schTotal').innerHTML = `<tr><th scope="row">합계</th><td class="num">${hours}시간</td><td class="num"><b>${used}일</b></td><td colspan="2" class="muted">${hours}시간 × ${perHour} = ${used}일</td></tr>`;
-    body.querySelector('#schResult').innerHTML = `
-      <div><span class="s-k">예상일</span><span class="s-v">${expected}<small>일</small></span><span class="s-f">볼륨 ${+SCH.volume || 0} × ${conv.dayPerVol}</span></div>
-      <div><span class="s-k">투입일</span><span class="s-v">${used}<small>일</small></span><span class="s-f">일일 일정표 ${hours}시간 × ${perHour}</span></div>
-      <div class="${ratio > 1 ? 'over' : ''}"><span class="s-k">투입 / 예상</span><span class="s-v">${expected ? Math.round(ratio * 1000) / 1000 : '–'}</span><span class="s-f">${!expected ? '예상일이 없습니다' : diff > 0 ? `예상보다 ${diff}일 더 씀` : diff < 0 ? `예상보다 ${-diff}일 덜 씀` : '예상과 같음'}</span></div>`;
-  };
-  body.innerHTML = `
-    <div class="s-two">
-      <article class="s-card">
-        <p class="s-tag">예상</p>
-        <h3>앱 종합 스케쥴</h3>
-        <p>${esc(volSrc ? volSrc[1] : '[키글] 앱 종합 스케쥴')}</p>
-        <ul>
-          <li>디자인볼륨 시트가 볼륨 기준입니다 (위 ‘볼륨 측정’과 같은 표).</li>
-          <li>★킥오프★ 시트의 디자인 열에 단위별 디자인 볼륨을 적습니다${t01 ? ` (${esc(t01.id)} ${esc(t01.name)})` : ''}.</li>
-          <li><b>예상일 = 볼륨 × ${conv.dayPerVol}</b> (${esc(conv.row ? `${conv.row[1]} = ${conv.row[2]}` : '')})</li>
-        </ul>
-      </article>
-      <article class="s-card">
-        <p class="s-tag">실제</p>
-        <h3>앱디 일일 일정표</h3>
-        <p>${legendSrc && /일일 일정표/.test(legendSrc[1] || '') ? '범례 시트의 출처에 함께 적힌 표입니다.' : '디자이너가 매일 실제로 한 작업을 적는 표입니다.'}</p>
-        <ul>
-          <li>하루 동안 어느 단위에 몇 시간을 썼는지 적습니다.</li>
-          <li>시간을 일로 바꿉니다: <b>1시간 = ${perHour}일</b> (하루 ${hoursPerDay}시간).</li>
-          <li><b>투입일 = 일일 일정표의 실제 투입 합계</b> (단위별로 모두 더함)</li>
-        </ul>
-      </article>
-    </div>
-    ${rule ? `<p class="s-rule">표에 적힌 규칙 · ${esc(rule)}</p>` : ''}
-    <div class="s-flow" aria-label="계산 흐름">
-      <div class="s-node">볼륨<small>앱 종합 스케쥴</small></div><div class="s-arrow">× ${conv.dayPerVol}</div><div class="s-node">예상일</div>
-      <div class="s-gap"></div>
-      <div class="s-node">작업 시간<small>앱디 일일 일정표</small></div><div class="s-arrow">× ${perHour} · 단위별 합계</div><div class="s-node">투입일</div>
-      <div class="s-gap"></div>
-      <div class="s-node hot">투입 ÷ 예상<small>1보다 크면 예상보다 오래 걸림</small></div>
-    </div>
-    <article class="s-card s-ex">
-      <p class="s-tag">예시 · 가상 숫자</p>
-      <h3>인게임 단위 A의 5일</h3>
-      <p>볼륨 측정에서 A를 <label for="sch_vol"><input type="number" min="0" step="0.1" inputmode="decimal" id="sch_vol" value="${SCH.volume}"> 볼륨</label>으로 책정했다고 가정합니다.
-        <button type="button" class="pill-btn s-pull" id="sch_pull">볼륨 측정 결과 가져오기</button></p>
-      <p>일일 일정표에는 날마다 A에 쓴 시간만 A의 투입으로 더합니다. 같은 날 다른 단위에 쓴 시간은 그 단위에 따로 적습니다. 시간을 바꾸면 결과가 바로 바뀝니다.</p>
-      <div class="s-tbl"><table>
-        <thead><tr><th scope="col">날짜</th><th scope="col">A에 쓴 시간</th><th scope="col">A 투입(일)</th><th scope="col">다른 단위</th><th scope="col">한 일 (워크플로우 작업)</th></tr></thead>
-        <tbody id="schRows"></tbody><tfoot id="schTotal"></tfoot>
-      </table></div>
-      <div class="s-result" id="schResult" aria-live="polite"></div>
-    </article>
-    <div class="s-two">
-      <article class="s-card">
-        <h3>표에서 확인한 것</h3>
-        <ul>
-          ${info.expectedCount ? `<li>실적 시트의 예상일 ${info.expectedCount}개 중 ${info.expectedHalfDay}개가 0.5일 단위입니다 (볼륨 0.1 = 0.5일).</li>` : ''}
-          ${info.inputCount ? `<li>투입일 ${info.inputCount}개 중 ${info.inputHourly}개가 1시간(${perHour}일) 단위입니다. 일일 일정표는 시간 단위로 적는 것으로 보입니다.</li>` : ''}
-          <li>볼륨에는 유니티 확인 · 리소스 가이드 · jpg 제작과 컨펌에 따른 수정이 포함됩니다 (볼륨 기준 시트).</li>
-        </ul>
-      </article>
-      <article class="s-card">
-        <h3>정해야 할 것</h3>
-        <ul>
-          <li>일일 일정표 원본은 이 표에 없어서 칸 구성은 알 수 없습니다. 위 예시는 ‘날짜 · 단위 · 시간’만 있다고 보고 계산했습니다.</li>
-          <li>회의 · 컨펌 대기 시간을 어느 단위의 투입으로 적을지 정해야 합니다.</li>
-          <li>여러 단위를 함께 다룬 회의(예: ${esc(tn('볼륨 책정 회의'))}) 시간을 나누는 방법이 필요합니다.</li>
-          <li><b>제안</b> · 볼륨에 컨펌 수정이 포함되므로, 수정 시간도 같은 단위의 투입으로 적어야 예상과 비교할 수 있습니다.</li>
-        </ul>
-      </article>
-    </div>`;
-  body.addEventListener('input', (e) => {
-    const el = e.target;
-    if (el.id === 'sch_vol') SCH.volume = el.value;
-    else if (el.dataset.day !== undefined) SCH.days[+el.dataset.day].a = el.value;
-    else return;
-    const id = el.id;
-    draw();
-    const again = document.getElementById(id);
-    if (again && again !== document.activeElement) again.focus();
-  });
-  body.addEventListener('click', (e) => {
-    if (!e.target.closest('#sch_pull')) return;
-    if (VOL.lastTotal) { SCH.volume = VOL.lastTotal; $('#sch_vol').value = VOL.lastTotal; draw(); }
-  });
-  draw();
+  const hoursPerDay = Math.round(1 / (conv.dayPerHour || 0.125));
+  const r2s = (n) => Math.round(n * 100) / 100;
+  const exVol = 0.8, exDays = r2s(exVol * conv.dayPerVol), exHours = r2s(exDays * hoursPerDay);
+  $('#schSub').textContent = '디자인 일정은 볼륨을 예상일로, 예상일을 시간으로 바꿔 씁니다.';
+  $('#schBody').innerHTML = `<div class="s-two">
+    <article class="s-card"><p class="s-tag">1 · 앱 종합 스케쥴표</p><p class="s-big">볼륨 1 = ${r2s(conv.dayPerVol)}일</p>
+      <p>볼륨을 예상일로 바꿔 씁니다. 예: 볼륨 ${exVol} → 예상 ${exDays}일</p></article>
+    <article class="s-card"><p class="s-tag">2 · 일일 일정표</p><p class="s-big">예상일 1일 = ${hoursPerDay}시간</p>
+      <p>예상일을 시간으로 잡아 작성합니다. 예: 예상 ${exDays}일 → ${exHours}시간</p></article>
+  </div>`;
 }
 
 /* ═════════════ 9. 조립 ═════════════ */

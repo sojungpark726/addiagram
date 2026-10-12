@@ -1,5 +1,5 @@
 """워크플로우 표(xlsx, 없으면 csv)를 읽어 site/workflow-data.js를 만든다.
-(워크플로우 · 요약 · 범례 · 볼륨 기준 시트. 개인별 실적 시트는 출처 줄과 개수 통계만 읽는다.)
+(워크플로우 · 요약 · 범례 · 볼륨 기준 시트. 개인별 실적 시트는 읽지 않는다.)
 
 사용: python site/build_data.py
 - 표준 라이브러리만 사용한다 (openpyxl 불필요).
@@ -23,37 +23,6 @@ WORKFLOW_SHEET = "워크플로우"
 SUMMARY_SHEET = "요약"
 LEGEND_SHEET = "범례·작성 가이드"
 VOLUME_SHEET = "볼륨 기준"
-PERF_SHEET = "실적 (예상 vs 투입)"
-
-
-def schedule_info(rows):
-    """실적 시트에서 일정 계산 규칙(출처 줄)과 개수 통계만 뽑는다. 이름 · 프로젝트 · 개별 값은 넣지 않는다."""
-    if not rows:
-        return {}
-    head = [h.strip() for h in rows[0]]
-    note = next((r[0].strip() for r in rows if r and r[0].strip().startswith("출처")), "")
-
-    def nums(col):
-        if col not in head:
-            return []
-        i = head.index(col)
-        out = []
-        for r in rows[1:]:
-            try:
-                out.append(float(r[i]))
-            except (IndexError, ValueError):
-                pass
-        return out
-
-    def multiple(v, step):
-        return abs(v / step - round(v / step)) < 1e-9
-
-    exp, used = nums("예상일"), nums("투입일")
-    return {
-        "note": note,
-        "expectedCount": len(exp), "expectedHalfDay": sum(multiple(v, 0.5) for v in exp),
-        "inputCount": len(used), "inputHourly": sum(multiple(v, 0.125) for v in used),
-    }
 
 
 def col_index(ref):
@@ -172,7 +141,6 @@ def main():
         payload["legend"] = trim(sheets.get(LEGEND_SHEET, []))
         payload["typeColors"] = type_colors(XLSX, WORKFLOW_SHEET, "유형")
         payload["volume"] = trim(sheets.get(VOLUME_SHEET, []))
-        payload["schedule"] = schedule_info(sheets.get(PERF_SHEET, []))
     elif CSV.exists():
         with open(CSV, encoding="utf-8-sig", newline="") as f:
             table = trim(list(csv.reader(f)))
@@ -180,7 +148,6 @@ def main():
         payload["summary"] = []
         payload["legend"] = []
         payload["volume"] = []
-        payload["schedule"] = {}
     else:
         sys.exit("워크플로우 표 파일(xlsx 또는 csv)이 없습니다.")
 
