@@ -1,6 +1,6 @@
 // 자동 생성 파일입니다. 직접 고치지 말고 build_data.py를 다시 실행하세요.
 window.WORKFLOW_DATA = {
- "generatedAt": "2026-10-13 02:32",
+ "generatedAt": "2026-10-13 02:52",
  "source": {
   "file": "앱디팀_워크플로우.xlsx",
   "sheet": "워크플로우"
@@ -334,6 +334,13 @@ window.WORKFLOW_DATA = {
    "[키글] 앱 종합 스케쥴 > 디자인볼륨, ★킥오프★"
   ]
  ],
+ "schedule": {
+  "note": "출처: [키글] 앱 종합 스케쥴 > ★킥오프★ 시트 (디자인 열). 예상일 = 볼륨 × 5, 투입일 = 일일 일정표 실제 투입 합계.",
+  "expectedCount": 259,
+  "expectedHalfDay": 259,
+  "inputCount": 217,
+  "inputHourly": 210
+ },
  "header": [
   "작업ID",
   "과정",
