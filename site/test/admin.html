@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>챗봇 관리자</title>
+<style>
+@font-face { font-family: "Pretendard Variable"; src: url("../fonts/PretendardVariable.woff2") format("woff2"); font-weight: 45 920; font-display: swap; }
+/* 챗봇 관리자: Q&A · 응답 문구 · 규칙 · 대화 기록 · 알림. 사이트와 같은 라이트 테마 · Pretendard */
+:root { color-scheme: light; --brand: #ff3b40; --text: #1d1d1f; --text-2: #6e6e73; --text-3: #8e8e93; --line: #d2d2d7; --g1: #f0f0f3; --g2: #e5e5ea; --bg: #fff; --bg-gray: #f5f5f7; --font: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; font-family: var(--font); background: var(--bg-gray); color: var(--text); line-height: 1.5; word-break: keep-all; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 28px 16px 80px; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.03em; }
+h1 small { font-size: 14px; font-weight: 600; color: var(--text-2); margin-left: 8px; letter-spacing: 0; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.tabs button, .btn { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); font-size: 14px; font-weight: 600; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--text); color: #fff; border-color: var(--text); }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--brand); border-color: var(--brand); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.card { margin-top: 18px; padding: 22px; border-radius: 20px; background: var(--bg); }
+.card h2 { margin: 0; font-size: 20px; font-weight: 700; }
+.cap { margin: 6px 0 0; color: var(--text-2); font-size: 14px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.status { margin-left: 8px; font-size: 13.5px; color: var(--text-2); }
+.status.err { color: var(--brand); }
+.login { max-width: 380px; margin: 80px auto; }
+.login label, .field { display: grid; gap: 4px; font-size: 13.5px; font-weight: 600; }
+input[type="text"], input[type="password"], input[type="number"], select, textarea { padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); font-size: 14.5px; }
+textarea { min-height: 90px; resize: vertical; }
+.qa { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 18px; margin-top: 16px; }
+@media (max-width: 860px) { .qa { grid-template-columns: 1fr; } }
+.cats { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.cats li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+.cats .pick { text-align: left; padding: 8px 10px; border-radius: 10px; border: 1px solid transparent; background: var(--bg-gray); cursor: pointer; font-weight: 600; }
+.cats .pick[aria-pressed="true"] { border-color: var(--text); background: var(--bg); }
+.cats .pick small { color: var(--text-3); font-weight: 500; margin-left: 4px; }
+.mini { display: flex; gap: 2px; }
+.mini button { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--g2); background: var(--bg); cursor: pointer; font-size: 12px; }
+.items { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.items li button { width: 100%; text-align: left; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--g2); background: var(--bg); cursor: pointer; }
+.items li button[aria-pressed="true"] { border-color: var(--brand); }
+.items b { display: block; font-size: 14.5px; }
+.items span { display: block; font-size: 13px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.editor { display: grid; gap: 12px; margin-top: 14px; padding: 16px; border-radius: 16px; background: var(--bg-gray); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 16px; }
+.field small { font-weight: 500; color: var(--text-2); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--g1); text-align: left; vertical-align: top; }
+th { font-size: 13px; color: var(--text-2); font-weight: 700; }
+tr.click { cursor: pointer; }
+tr.click:hover td { background: var(--bg-gray); }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--g1); color: var(--text-2); }
+.tag.red { background: var(--brand); color: #fff; }
+.tag.dark { background: var(--text); color: #fff; }
+.log { display: grid; gap: 8px; margin-top: 12px; }
+.log .q { justify-self: end; max-width: 80%; padding: 8px 12px; border-radius: 12px; background: var(--text); color: #fff; white-space: pre-wrap; }
+.log .a { max-width: 80%; padding: 8px 12px; border-radius: 12px; background: var(--bg-gray); white-space: pre-wrap; }
+.log .k { font-size: 12px; color: var(--text-3); }
+.tbl { overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="card login" id="login">
+    <h2>챗봇 관리자</h2>
+    <p class="cap">테스트 빌드(/test)의 안내 챗봇을 관리합니다.</p>
+    <form id="loginForm" class="row" style="margin-top:14px;display:grid;gap:10px">
+      <label>비밀번호<input type="password" id="pw" autocomplete="current-password" required></label>
+      <button class="btn primary" type="submit">로그인</button>
+      <span class="status err" id="loginErr" role="alert"></span>
+    </form>
+  </section>
+
+  <div id="app" hidden>
+    <header>
+      <h1>챗봇 관리자<small id="modelInfo"></small></h1>
+      <nav class="tabs" role="tablist" aria-label="관리 메뉴">
+        <button type="button" role="tab" data-tab="qa" aria-selected="true">Q&amp;A</button>
+        <button type="button" role="tab" data-tab="msg" aria-selected="false">응답 문구</button>
+        <button type="button" role="tab" data-tab="rules" aria-selected="false">규칙</button>
+        <button type="button" role="tab" data-tab="logs" aria-selected="false">대화 기록</button>
+        <button type="button" role="tab" data-tab="notify" aria-selected="false">알림</button>
+        <button type="button" class="btn ghost" id="logout">로그아웃</button>
+      </nav>
+    </header>
+
+    <section class="card" data-panel="qa">
+      <h2>Q&amp;A</h2>
+      <p class="cap">챗봇은 이 Q&amp;A만 근거로 답합니다. 질문이 여기 있는 것과 비슷하면 모델을 쓰지 않고 이 답을 그대로 보여 줍니다. 키워드는 쉼표로 나눠 적으세요.</p>
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="saveKb">변경 저장</button><button class="btn danger" id="resetKb">초기값으로 되돌리기</button><span class="status" id="kbStatus"></span></div>
+      <div class="qa">
+        <div>
+          <ul class="cats" id="cats"></ul>
+          <div class="row" style="margin-top:10px"><input type="text" id="newCat" placeholder="새 카테고리 이름" aria-label="새 카테고리 이름"><button class="btn" id="addCat">추가</button></div>
+        </div>
+        <div>
+          <div class="row"><b id="catTitle"></b><button class="btn" id="addItem">새 질문</button></div>
+          <ul class="items" id="items"></ul>
+          <form class="editor" id="editor" hidden>
+            <label class="field">카테고리<select id="eCat"></select></label>
+            <label class="field">질문<input type="text" id="eQ" maxlength="200" required></label>
+            <label class="field">답변<textarea id="eA" maxlength="1500" required></textarea></label>
+            <label class="field">키워드 <small>쉼표로 구분</small><input type="text" id="eK"></label>
+            <div class="row"><button class="btn primary" type="submit">이 질문 적용</button><button class="btn danger" type="button" id="delItem">이 질문 삭제</button><span class="status">적용 후 위의 ‘변경 저장’을 눌러야 서버에 저장됩니다.</span></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" data-panel="msg" hidden>
+      <h2>응답 문구</h2>
+      <p class="cap">규칙에 걸렸을 때 챗봇이 보여 주는 고정 문구입니다. 이 문구들은 모델을 쓰지 않습니다.</p>
+      <div class="grid2" id="msgFields"></div>
+      <div class="row" style="margin-top:14px"><button class="btn primary" id="saveMsg">저장</button><span class="status" id="msgStatus"></span></div>
+    </section>
+
+    <section class="card" data-panel="rules" hidden>
+      <h2>규칙</h2>
+      <p class="cap">이상한 사용을 막는 기준입니다. 경고가 쌓이면 대화를 종료하고, 같은 접속에서 종료가 반복되면 24시간 막습니다.</p>
+      <div class="grid2" id="ruleFields"></div>
+      <label class="field" style="margin-top:14px">답변 방식 (모델에 주는 추가 지침)<textarea id="guidance" maxlength="800"></textarea></label>
+      <div class="row" style="margin-top:14px"><button class="btn primary" id="saveRules">저장</button><span class="status" id="rulesStatus"></span></div>
+      <h2 style="margin-top:26px">경고가 쌓이는 경우</h2>
+      <ul class="cap">
+        <li>의미 없는 글자(같은 글자 반복, 자음·모음만, 기호 위주)</li>
+        <li>지침 · 프롬프트를 알아내거나 규칙을 무시하게 하려는 질문 (문장 패턴으로 먼저 거르고, 모델도 한 번 더 판단)</li>
+        <li>사이트와 관련 없는 질문 (모델 판단)</li>
+        <li>같은 질문을 허용 횟수보다 많이 반복</li>
+        <li>욕설 · 일부러 길게 답하게 만드는 요청 등 정상 이용으로 보기 어려운 질문 (모델 판단)</li>
+      </ul>
+    </section>
+
+    <section class="card" data-panel="logs" hidden>
+      <h2>대화 기록</h2>
+      <p class="cap">최근 대화 300개. 줄을 누르면 내용을 봅니다. 대화 기록은 30일 뒤 자동으로 지워집니다.</p>
+      <div class="row" style="margin-top:10px"><button class="btn" id="reloadLogs">새로고침</button><span class="status" id="logStatus"></span></div>
+      <div class="tbl"><table><thead><tr><th>마지막</th><th>이름</th><th>소속</th><th>질문</th><th>경고</th><th>상태</th></tr></thead><tbody id="logRows"></tbody></table></div>
+      <div id="logDetail"></div>
+    </section>
+
+    <section class="card" data-panel="notify" hidden>
+      <h2>대화 시작 알림</h2>
+      <p class="cap">대화가 시작될 때마다 쌓이고, Claude 예약 작업이 Gmail 커넥터로 묶어서 보낸 뒤 ‘보냄’으로 바뀝니다.</p>
+      <div class="row" style="margin-top:10px"><button class="btn" id="reloadNotify">새로고침</button><span class="status" id="notifyStatus"></span></div>
+      <div class="tbl"><table><thead><tr><th>시작</th><th>이름</th><th>소속</th><th>이메일</th><th>첫 질문</th><th>메일</th></tr></thead><tbody id="notifyRows"></tbody></table></div>
+    </section>
+  </div>
+</div>
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = (t) => (t ? new Date(t).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '');
+const uid = () => Math.random().toString(36).slice(2, 10);
+let token = null; try { token = sessionStorage.getItem('appd-admin'); } catch (e) {}
+let KB = null, CFG = null, DEF = null, cat = null, item = null;
+const MSG_LABEL = { welcome: '시작 인사', offTopic: '사이트와 관련 없는 질문', noInfo: '안내 자료에 없는 질문', injection: '지침·프롬프트를 캐는 질문', duplicate: '같은 질문 반복', throttle: '질문이 너무 빠를 때', gibberish: '의미 없는 글자', tooLong: '질문이 너무 길 때', limit: '질문 수를 다 썼을 때', locked: '대화 종료', blocked: '접속 차단', error: '서버 · 모델 오류' };
+const RULE_LABEL = { maxLen: ['질문 최대 글자 수', '자'], perMinute: ['1분에 할 수 있는 질문 수', '개'], perSession: ['대화 하나의 질문 수', '개'], duplicateFree: ['같은 질문을 이전 답으로 다시 보여 줄 횟수', '번 (넘으면 경고)'], strikeLimit: ['대화를 종료할 경고 수', '번'], lockedPerDay: ['하루에 이만큼 종료되면 24시간 차단', '번'], sessionsPerDay: ['같은 접속에서 하루에 시작할 수 있는 대화 수', '개'], faqThreshold: ['Q&A 그대로 답하는 유사도 (0~1)', '높을수록 엄격'], maxAnswer: ['답변 최대 글자 수', '자'] };
+
+async function api(path, opts = {}) {
+  const r = await fetch(`/api/admin/${path}`, { ...opts, headers: { 'content-type': 'application/json', authorization: `Bearer ${token}`, ...(opts.headers || {}) } });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { logout(); throw new Error(j.error || '다시 로그인해 주세요.'); }
+  if (!r.ok) throw new Error(j.error || `오류 ${r.status}`);
+  return j;
+}
+function logout() { token = null; try { sessionStorage.removeItem('appd-admin'); } catch (e) {} $('#app').hidden = true; $('#login').hidden = false; }
+$('#logout').onclick = logout;
+$('#loginForm').onsubmit = async (e) => {
+  e.preventDefault(); $('#loginErr').textContent = '';
+  try {
+    const r = await fetch('/api/admin/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: $('#pw').value }) });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || '로그인하지 못했어요.');
+    token = j.token; try { sessionStorage.setItem('appd-admin', token); } catch (x) {}
+    $('#pw').value = ''; start();
+  } catch (x) { $('#loginErr').textContent = x.message; }
+};
+document.querySelectorAll('[data-tab]').forEach((b) => b.onclick = () => {
+  document.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+  document.querySelectorAll('[data-panel]').forEach((p) => p.hidden = p.dataset.panel !== b.dataset.tab);
+  if (b.dataset.tab === 'logs') loadLogs();
+  if (b.dataset.tab === 'notify') loadNotify();
+});
+const status = (id, text, err) => { const s = $(id); s.textContent = text; s.classList.toggle('err', !!err); };
+
+/* ── Q&A ── */
+function drawCats() {
+  KB.categories.sort((a, b) => a.order - b.order);
+  $('#cats').innerHTML = KB.categories.map((c, i) => `<li><button type="button" class="pick" data-cat="${esc(c.id)}" aria-pressed="${c.id === cat}">${esc(c.name)}<small>${KB.items.filter((x) => x.catId === c.id).length}</small></button>
+    <span class="mini"><button type="button" data-up="${i}" aria-label="${esc(c.name)} 위로">▲</button><button type="button" data-down="${i}" aria-label="${esc(c.name)} 아래로">▼</button><button type="button" data-ren="${esc(c.id)}" aria-label="${esc(c.name)} 이름 바꾸기">✎</button><button type="button" data-del="${esc(c.id)}" aria-label="${esc(c.name)} 삭제">✕</button></span></li>`).join('');
+  $('#eCat').innerHTML = KB.categories.map((c) => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+  drawItems();
+}
+function drawItems() {
+  const c = KB.categories.find((x) => x.id === cat);
+  $('#catTitle').textContent = c ? c.name : '카테고리를 고르세요';
+  $('#items').innerHTML = KB.items.filter((x) => x.catId === cat).map((x) => `<li><button type="button" data-item="${esc(x.id)}" aria-pressed="${x.id === item}"><b>${esc(x.question)}</b><span>${esc(x.answer)}</span></button></li>`).join('') || '<li class="cap">질문이 없습니다.</li>';
+}
+function openItem(id) {
+  item = id; const x = KB.items.find((i) => i.id === id);
+  $('#editor').hidden = !x; drawItems();
+  if (!x) return;
+  $('#eCat').value = x.catId; $('#eQ').value = x.question; $('#eA').value = x.answer; $('#eK').value = (x.keywords || []).join(', ');
+  $('#eQ').focus();
+}
+$('#cats').onclick = (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  const cs = KB.categories;
+  if (b.dataset.cat) { cat = b.dataset.cat; item = null; $('#editor').hidden = true; drawCats(); return; }
+  if (b.dataset.up || b.dataset.down) {
+    const i = +(b.dataset.up ?? b.dataset.down), j = b.dataset.up ? i - 1 : i + 1;
+    if (j < 0 || j >= cs.length) return;
+    [cs[i].order, cs[j].order] = [cs[j].order, cs[i].order]; [cs[i], cs[j]] = [cs[j], cs[i]]; cs.forEach((c, k) => c.order = k);
+    drawCats(); status('#kbStatus', '저장하지 않은 변경이 있어요.'); return;
+  }
+  if (b.dataset.ren) { const c = cs.find((x) => x.id === b.dataset.ren); const n = prompt('새 카테고리 이름', c.name); if (n && n.trim()) { c.name = n.trim().slice(0, 40); drawCats(); status('#kbStatus', '저장하지 않은 변경이 있어요.'); } return; }
+  if (b.dataset.del) {
+    const c = cs.find((x) => x.id === b.dataset.del), n = KB.items.filter((x) => x.catId === c.id).length;
+    if (!confirm(`‘${c.name}’ 카테고리${n ? `와 질문 ${n}개` : ''}를 삭제할까요?`)) return;
+    KB.categories = cs.filter((x) => x.id !== c.id); KB.items = KB.items.filter((x) => x.catId !== c.id);
+    cat = KB.categories[0]?.id; drawCats(); status('#kbStatus', '저장하지 않은 변경이 있어요.');
+  }
+};
+$('#addCat').onclick = () => { const n = $('#newCat').value.trim(); if (!n) return; const c = { id: 'c' + uid(), name: n.slice(0, 40), order: KB.categories.length }; KB.categories.push(c); cat = c.id; $('#newCat').value = ''; drawCats(); status('#kbStatus', '저장하지 않은 변경이 있어요.'); };
+$('#items').onclick = (e) => { const b = e.target.closest('[data-item]'); if (b) openItem(b.dataset.item); };
+$('#addItem').onclick = () => { if (!cat) return; const x = { id: 'q' + uid(), catId: cat, question: '새 질문', answer: '답변을 입력하세요.', keywords: [] }; KB.items.push(x); openItem(x.id); status('#kbStatus', '저장하지 않은 변경이 있어요.'); };
+$('#editor').onsubmit = (e) => {
+  e.preventDefault(); const x = KB.items.find((i) => i.id === item); if (!x) return;
+  x.catId = $('#eCat').value; x.question = $('#eQ').value.trim(); x.answer = $('#eA').value.trim(); x.keywords = $('#eK').value.split(',').map((k) => k.trim()).filter(Boolean); x.updatedAt = Date.now();
+  cat = x.catId; drawCats(); status('#kbStatus', '저장하지 않은 변경이 있어요.');
+};
+$('#delItem').onclick = () => { const x = KB.items.find((i) => i.id === item); if (!x || !confirm(`‘${x.question}’를 삭제할까요?`)) return; KB.items = KB.items.filter((i) => i.id !== item); item = null; $('#editor').hidden = true; drawCats(); status('#kbStatus', '저장하지 않은 변경이 있어요.'); };
+$('#saveKb').onclick = async () => { try { KB = await api('kb', { method: 'PUT', body: JSON.stringify(KB) }); drawCats(); status('#kbStatus', '저장했어요.'); } catch (x) { status('#kbStatus', x.message, true); } };
+$('#resetKb').onclick = async () => { if (!confirm('Q&A를 처음 제공된 내용으로 되돌릴까요? 지금 내용은 사라집니다.')) return; try { KB = await api('kb/reset', { method: 'POST' }); cat = KB.categories[0]?.id; item = null; $('#editor').hidden = true; drawCats(); status('#kbStatus', '초기값으로 되돌렸어요.'); } catch (x) { status('#kbStatus', x.message, true); } };
+
+/* ── 응답 문구 · 규칙 ── */
+function drawConfig() {
+  $('#msgFields').innerHTML = Object.keys(MSG_LABEL).map((k) => `<label class="field">${MSG_LABEL[k]}<textarea data-msg="${k}" maxlength="400">${esc(CFG.messages[k])}</textarea></label>`).join('');
+  $('#ruleFields').innerHTML = Object.keys(RULE_LABEL).map((k) => `<label class="field">${RULE_LABEL[k][0]} <small>${RULE_LABEL[k][1]} · 기본 ${DEF.limits[k]}</small><input type="number" step="${k === 'faqThreshold' ? '0.05' : '1'}" min="0" data-rule="${k}" value="${CFG.limits[k]}"></label>`).join('');
+  $('#guidance').value = CFG.guidance;
+}
+async function saveConfig(statusId) {
+  const next = { messages: {}, limits: {}, guidance: $('#guidance').value };
+  document.querySelectorAll('[data-msg]').forEach((t) => next.messages[t.dataset.msg] = t.value);
+  document.querySelectorAll('[data-rule]').forEach((i) => next.limits[i.dataset.rule] = Number(i.value));
+  try { CFG = await api('config', { method: 'PUT', body: JSON.stringify(next) }); drawConfig(); status(statusId, '저장했어요.'); } catch (x) { status(statusId, x.message, true); }
+}
+$('#saveMsg').onclick = () => saveConfig('#msgStatus');
+$('#saveRules').onclick = () => saveConfig('#rulesStatus');
+
+/* ── 대화 기록 ── */
+const KIND = { answer: '모델 답변', faq: 'Q&A 답변', repeat: '이전 답 다시', duplicate: '반복 경고', off_topic: '무관 질문', prompt_attack: '지침 캐기', abuse: '이상 사용', gibberish: '의미 없는 글자', too_long: '너무 김', no_info: '자료 없음', error: '오류', throttle: '너무 빠름' };
+async function loadLogs() {
+  try {
+    const rows = await api('sessions');
+    $('#logRows').innerHTML = rows.map((s) => `<tr class="click" data-sess="${esc(s.id)}"><td>${fmt(s.last)}</td><td>${esc(s.name)}</td><td>${esc(s.org)}</td><td>${s.count ?? 0}</td><td>${s.strikes ? `<span class="tag red">${s.strikes}</span>` : 0}</td><td>${s.locked ? '<span class="tag dark">종료</span>' : '<span class="tag">진행</span>'}</td></tr>`).join('') || '<tr><td colspan="6" class="cap">아직 대화가 없어요.</td></tr>';
+    status('#logStatus', `${rows.length}개`);
+  } catch (x) { status('#logStatus', x.message, true); }
+}
+$('#reloadLogs').onclick = loadLogs;
+$('#logRows').onclick = async (e) => {
+  const tr = e.target.closest('[data-sess]'); if (!tr) return;
+  try {
+    const s = await api(`sessions/${tr.dataset.sess}`);
+    $('#logDetail').innerHTML = `<div class="editor"><div class="row"><b>${esc(s.name)}</b><span class="cap">${esc(s.org)} ${esc(s.email)} · 시작 ${fmt(s.createdAt)} · 질문 ${s.count} · 경고 ${s.strikes}</span><button class="btn danger" id="delSess" data-id="${esc(s.id)}">이 대화 삭제</button></div>
+      ${s.flags?.length ? `<p class="cap">경고: ${s.flags.map((f) => `${KIND[f.kind] || f.kind}(${esc(f.q)})`).join(' · ')}</p>` : ''}
+      <div class="log">${(s.history || []).map((h) => `<div class="q">${esc(h.q)}</div><div class="a">${esc(h.a)}</div><div class="k">${KIND[h.kind] || h.kind} · ${fmt(h.t)}${h.err ? ' · ' + esc(h.err) : ''}</div>`).join('')}</div></div>`;
+    $('#delSess').onclick = async (ev) => { if (!confirm('이 대화 기록을 삭제할까요?')) return; await api(`sessions/${ev.target.dataset.id}`, { method: 'DELETE' }); $('#logDetail').innerHTML = ''; loadLogs(); };
+  } catch (x) { status('#logStatus', x.message, true); }
+};
+
+/* ── 알림 ── */
+async function loadNotify() {
+  try {
+    const rows = (await api('notifications')).reverse();
+    $('#notifyRows').innerHTML = rows.map((n) => `<tr><td>${fmt(n.startedAt)}</td><td>${esc(n.name)}</td><td>${esc(n.org)}</td><td>${esc(n.email)}</td><td>${esc(n.firstQuestion)}</td><td>${n.sent ? '<span class="tag">보냄</span>' : '<span class="tag red">대기</span>'}</td></tr>`).join('') || '<tr><td colspan="6" class="cap">아직 없어요.</td></tr>';
+    status('#notifyStatus', `대기 ${rows.filter((n) => !n.sent).length}개`);
+  } catch (x) { status('#notifyStatus', x.message, true); }
+}
+$('#reloadNotify').onclick = loadNotify;
+
+async function start() {
+  try {
+    const [kb, c] = await Promise.all([api('kb'), api('config')]);
+    KB = kb; CFG = c.config; DEF = c.defaults;
+    $('#modelInfo').textContent = `모델 ${c.model}${c.hasKey ? '' : ' · API 키 없음'}`;
+    cat = KB.categories[0]?.id;
+    $('#login').hidden = true; $('#app').hidden = false;
+    drawCats(); drawConfig();
+  } catch (x) { $('#loginErr').textContent = x.message; }
+}
+if (token) start();
+</script>
+</body>
+</html>

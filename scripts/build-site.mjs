@@ -36,9 +36,12 @@ const metaTags = [
   `<meta name="twitter:image" content="${SITE.url}${SITE.image}">`,
 ].join('\n');
 const src = join(root, 'site');
-const out = join(root, 'public');
+// --test: 챗봇이 붙은 테스트 빌드 → public-test/test/ (Cloudflare addiagram-test Worker 전용, 정식 빌드에는 영향 없음)
+const TEST = process.argv.includes('--test');
+const outRoot = join(root, TEST ? 'public-test' : 'public');
+const out = TEST ? join(outRoot, 'test') : outRoot;
 
-rmSync(out, { recursive: true, force: true });
+rmSync(outRoot, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
 // 1) index.html: <header> 앞(제목 · 폰트 · 스타일)은 <head>로, 나머지는 <body>로
@@ -50,11 +53,11 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-${metaTags}
-${page.slice(0, cut).trim()}
+${TEST ? '<meta name="robots" content="noindex, nofollow">' : metaTags}
+${page.slice(0, cut).trim()}${TEST ? '\n<link rel="stylesheet" href="chat.css">' : ''}
 </head>
 <body>
-${page.slice(cut).trim()}
+${page.slice(cut).trim()}${TEST ? '\n<script src="chat.js" defer></script>' : ''}
 </body>
 </html>
 `;
@@ -65,9 +68,17 @@ cpSync(join(src, 'workflow-data.js'), join(out, 'workflow-data.js'));
 cpSync(join(src, SITE.image), join(out, SITE.image));
 cpSync(join(src, 'fonts'), join(out, 'fonts'), { recursive: true });
 
+// 3) 테스트 빌드만: 챗봇 위젯과 관리자 페이지
+if (TEST) {
+  cpSync(join(src, 'test', 'chat.js'), join(out, 'chat.js'));
+  cpSync(join(src, 'test', 'chat.css'), join(out, 'chat.css'));
+  mkdirSync(join(out, 'admin'), { recursive: true });
+  cpSync(join(src, 'test', 'admin.html'), join(out, 'admin', 'index.html'));
+}
+
 // 결과 목록
 const list = (dir) => readdirSync(dir).flatMap((name) => {
   const p = join(dir, name);
   return statSync(p).isDirectory() ? list(p) : [p];
 });
-for (const f of list(out)) console.log(`${relative(root, f).replaceAll('\\', '/')}  ${statSync(f).size} bytes`);
+for (const f of list(outRoot)) console.log(`${relative(root, f).replaceAll('\\', '/')}  ${statSync(f).size} bytes`);

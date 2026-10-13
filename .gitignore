@@ -18,3 +18,8 @@ dist/
 _backup/
 remote_test.txt
 sample_note.txt
+
+# 테스트 빌드 결과 · 로컬 비밀값
+public-test/
+.dev.vars*
+!.env.example
