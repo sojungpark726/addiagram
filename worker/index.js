@@ -292,13 +292,12 @@ async function chatMessage(request, env) {
   }
 }
 async function fillFirstQuestion(env, s, question) {
-  const { keys } = await env.CHAT_KV.list({ prefix: `notify:${s.createdAt}:${s.id}` });
-  for (const k of keys) {
-    const n = await kvGet(env, k.name, null);
-    if (n && !n.firstQuestion) {
-      n.firstQuestion = clip(question, 300);
-      await env.CHAT_KV.put(k.name, JSON.stringify(n), { expirationTtl: 30 * DAY, metadata: k.metadata || { sent: false } });
-    }
+  // list()는 방금 쓴 키가 늦게 보일 수 있어 키를 직접 읽는다
+  const key = `notify:${s.createdAt}:${s.id}`;
+  const { value, metadata } = await env.CHAT_KV.getWithMetadata(key, 'json');
+  if (value && !value.firstQuestion) {
+    value.firstQuestion = clip(question, 300);
+    await env.CHAT_KV.put(key, JSON.stringify(value), { expirationTtl: 30 * DAY, metadata: metadata || { sent: false } });
   }
 }
 
