@@ -17,7 +17,9 @@
     { "binding": "CHAT_KV", "id": "d6b5d0320f92475aa2f194afcd121f58" }
   ],
   "vars": {
-    "OPENAI_MODEL": "gpt-5.6-terra"
+    "OPENAI_MODEL": "gpt-5.6-terra",
+    // 테스트 Worker는 첫 화면이 없어서 /로 오면 /test/로 보냄
+    "ROOT_REDIRECT": "/test/"
   }
   // 비밀값(OPENAI_API_KEY · ADMIN_PASSWORD · NOTIFY_TOKEN)은 .env에 적고
   // wrangler deploy -c wrangler.test.jsonc --secrets-file .env 로 올립니다.

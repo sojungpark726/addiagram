@@ -1,13 +1,27 @@
 {
-  // Worker 코드 없이 public/의 정적 파일만 배포
+  // 정식 빌드: public/의 사이트 + 챗봇 · 관리자(/admin/) · API
+  // 배포: wrangler deploy --secrets-file .env (테스트 빌드는 wrangler.test.jsonc)
   "name": "addiagram",
-  "compatibility_date": "2026-10-12",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-08",
   "workers_dev": true,
   "build": {
     // Windows에서는 cmd로 실행되므로 rm·cp 같은 sh 명령 대신 Node 스크립트를 씀
     "command": "node scripts/build-site.mjs"
   },
   "assets": {
-    "directory": "./public/"
+    "directory": "./public/",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  // 정식 대화 기록 · Q&A · 설정 (테스트와 따로 저장)
+  "kv_namespaces": [
+    { "binding": "CHAT_KV", "id": "ca96f0e80266429285e5fc6c8c928587" }
+  ],
+  "vars": {
+    "OPENAI_MODEL": "gpt-5.6-terra",
+    // Vercel 사이트의 챗봇이 이 Worker의 /api/chat/* 를 부를 수 있게 허용
+    "ALLOWED_ORIGINS": "https://addiagram.vercel.app"
   }
+  // 비밀값(OPENAI_API_KEY · ADMIN_PASSWORD · NOTIFY_TOKEN)은 .env에 적고 --secrets-file .env 로 올립니다.
 }

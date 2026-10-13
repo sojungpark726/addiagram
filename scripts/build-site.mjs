@@ -14,6 +14,8 @@ const SITE = {
   description: '앱디팀(App Design)의 디자인 업무 흐름을 과정·역할별로 한눈에 보는 워크플로우 다이어그램입니다. 컨펌·반려 흐름과 승인자, 반복 작업을 확인할 수 있습니다.',
   image: 'og-image.png',
   imageAlt: 'App Design 워크플로우 다이어그램',
+  // 챗봇 서버: Cloudflare 정식 Worker. Vercel에는 서버가 없어서 정식 빌드의 챗봇은 이 주소를 부른다
+  chatApi: 'https://addiagram.landing-test.workers.dev',
 };
 const attr = (s) => s.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 const metaTags = [
@@ -36,7 +38,7 @@ const metaTags = [
   `<meta name="twitter:image" content="${SITE.url}${SITE.image}">`,
 ].join('\n');
 const src = join(root, 'site');
-// --test: 챗봇이 붙은 테스트 빌드 → public-test/test/ (Cloudflare addiagram-test Worker 전용, 정식 빌드에는 영향 없음)
+// --test: 테스트 빌드 → public-test/test/ (Cloudflare addiagram-test Worker 전용). 챗봇은 같은 주소의 서버를 부른다
 const TEST = process.argv.includes('--test');
 const outRoot = join(root, TEST ? 'public-test' : 'public');
 const out = TEST ? join(outRoot, 'test') : outRoot;
@@ -54,10 +56,12 @@ const html = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 ${TEST ? '<meta name="robots" content="noindex, nofollow">' : metaTags}
-${page.slice(0, cut).trim()}${TEST ? '\n<link rel="stylesheet" href="chat.css">' : ''}
+${page.slice(0, cut).trim()}
+<link rel="stylesheet" href="chat.css">
 </head>
 <body>
-${page.slice(cut).trim()}${TEST ? '\n<script src="chat.js" defer></script>' : ''}
+${page.slice(cut).trim()}
+<script src="chat.js"${TEST ? '' : ` data-api="${SITE.chatApi}"`} defer></script>
 </body>
 </html>
 `;
@@ -68,13 +72,11 @@ cpSync(join(src, 'workflow-data.js'), join(out, 'workflow-data.js'));
 cpSync(join(src, SITE.image), join(out, SITE.image));
 cpSync(join(src, 'fonts'), join(out, 'fonts'), { recursive: true });
 
-// 3) 테스트 빌드만: 챗봇 위젯과 관리자 페이지
-if (TEST) {
-  cpSync(join(src, 'test', 'chat.js'), join(out, 'chat.js'));
-  cpSync(join(src, 'test', 'chat.css'), join(out, 'chat.css'));
-  mkdirSync(join(out, 'admin'), { recursive: true });
-  cpSync(join(src, 'test', 'admin.html'), join(out, 'admin', 'index.html'));
-}
+// 3) 챗봇 위젯과 관리자 페이지 (원본은 site/test/)
+cpSync(join(src, 'test', 'chat.js'), join(out, 'chat.js'));
+cpSync(join(src, 'test', 'chat.css'), join(out, 'chat.css'));
+mkdirSync(join(out, 'admin'), { recursive: true });
+cpSync(join(src, 'test', 'admin.html'), join(out, 'admin', 'index.html'));
 
 // 결과 목록
 const list = (dir) => readdirSync(dir).flatMap((name) => {

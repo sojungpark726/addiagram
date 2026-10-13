@@ -1,4 +1,4 @@
-// App Design 워크플로우 · 테스트 빌드(/test) 서버
+// App Design 워크플로우 챗봇 서버 (정식 addiagram · 테스트 addiagram-test Worker 공용)
 // - /api/chat/*  : 안내 챗봇 (규칙 → 관리자 Q&A → gpt-5.6-terra 순서로 답함)
 // - /api/admin/* : 관리자 (Q&A · 응답 문구 · 규칙 · 대화 기록 · 알림 대기)
 // - /api/notify/*: 대화 시작 알림 목록 (Claude 예약 작업이 Gmail 커넥터로 묶어서 보냄)
@@ -418,16 +418,35 @@ async function api(request, env, url) {
   throw new HttpError(404, '없는 경로입니다.');
 }
 
+/* ───────── 다른 주소에서 부르는 챗봇 (CORS) ─────────
+   ALLOWED_ORIGINS(쉼표 구분)에 적힌 사이트만 /api/chat/* 를 부를 수 있다. 관리자 · 알림 API는 같은 주소에서만 쓴다. */
+function corsHeaders(request, env, url) {
+  const origin = request.headers.get('Origin');
+  if (!origin || !url.pathname.startsWith('/api/chat/')) return null;
+  const allowed = String(env.ALLOWED_ORIGINS || '').split(',').map((o) => o.trim()).filter(Boolean);
+  if (!allowed.includes(origin)) return null;
+  return { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'content-type', 'Access-Control-Max-Age': '86400', Vary: 'Origin' };
+}
+function withHeaders(res, headers) {
+  if (!headers) return res;
+  const r = new Response(res.body, res);
+  for (const [k, v] of Object.entries(headers)) r.headers.set(k, v);
+  return r;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // 테스트 Worker는 첫 화면이 없어서 /test/로 보낸다 (정식은 / 파일이 먼저 응답해 여기까지 오지 않음)
+    if (url.pathname === '/' && env.ROOT_REDIRECT) return Response.redirect(new URL(env.ROOT_REDIRECT, url).toString(), 302);
+    if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
+    const cors = corsHeaders(request, env, url);
+    if (request.method === 'OPTIONS') return new Response(null, { status: cors ? 204 : 403, headers: cors || {} });
     try {
-      if (url.pathname === '/') return Response.redirect(new URL('/test/', url).toString(), 302);
-      if (url.pathname.startsWith('/api/')) return await api(request, env, url);
-      return env.ASSETS.fetch(request);
+      return withHeaders(await api(request, env, url), cors);
     } catch (e) {
-      if (e instanceof HttpError) return json({ error: e.message }, e.status);
-      return json({ error: '서버 오류가 났어요.' }, 500);
+      if (e instanceof HttpError) return withHeaders(json({ error: e.message }, e.status), cors);
+      return withHeaders(json({ error: '서버 오류가 났어요.' }, 500), cors);
     }
   },
 };

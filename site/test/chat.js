@@ -1,6 +1,7 @@
-// 안내 챗봇 위젯 (테스트 빌드 /test 전용). 서버: /api/chat/*
+// 안내 챗봇 위젯 (정식 · 테스트 빌드 공용). 서버: /api/chat/*
+// <script data-api="https://…">가 있으면 그 서버로 보낸다 (Vercel처럼 서버가 없는 곳). 없으면 같은 주소.
 (function () {
-  const API = '/api/chat';
+  const API = `${(document.currentScript?.dataset.api || '').replace(/\/+$/, '')}/api/chat`;
   const KEY = 'appd-chat-session';
   const el = (tag, attrs = {}, html = '') => { const e = document.createElement(tag); Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v)); e.innerHTML = html; return e; };
   const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
