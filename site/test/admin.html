@@ -69,6 +69,26 @@ tr.click:hover td { background: var(--bg-gray); }
 .log .a { max-width: 80%; padding: 8px 12px; border-radius: 12px; background: var(--bg-gray); white-space: pre-wrap; }
 .log .k { font-size: 12px; color: var(--text-3); }
 .tbl { overflow-x: auto; }
+/* 감정 */
+.bars { display: grid; gap: 5px; margin-top: 10px; }
+.bar { display: grid; grid-template-columns: 84px minmax(0, 1fr) 44px; gap: 8px; align-items: center; font-size: 13px; }
+.bar i { display: block; height: 10px; border-radius: 999px; background: var(--g1); overflow: hidden; }
+.bar i b { display: block; height: 100%; border-radius: inherit; background: var(--text-3); }
+.bar.top i b { background: var(--brand); }
+.bar span:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.emo-test { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 14px; padding: 16px; border-radius: 16px; background: var(--bg-gray); }
+@media (max-width: 760px) { .emo-test { grid-template-columns: 1fr; } }
+.emo-test .field { align-content: start; }
+.emo-test textarea { min-height: 150px; }
+.emo-rule { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--bg); font-size: 13.5px; }
+.labels td input, .labels td textarea { width: 100%; min-width: 0; }
+.labels td textarea { min-height: 58px; }
+.labels td:nth-child(3) input { width: 70px; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14px; font-weight: 600; }
+.check input { width: 17px; height: 17px; accent-color: var(--brand); }
+.trail { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.tag.emo { background: #fff0f0; color: var(--brand); }
+.tag.calm { background: var(--g1); color: var(--text-2); }
 </style>
 </head>
 <body>
@@ -91,6 +111,7 @@ tr.click:hover td { background: var(--bg-gray); }
         <button type="button" role="tab" data-tab="qa" aria-selected="true">Q&amp;A</button>
         <button type="button" role="tab" data-tab="msg" aria-selected="false">응답 문구</button>
         <button type="button" role="tab" data-tab="rules" aria-selected="false">규칙</button>
+        <button type="button" role="tab" data-tab="emo" aria-selected="false">감정 응대</button>
         <button type="button" role="tab" data-tab="logs" aria-selected="false">대화 기록</button>
         <button type="button" role="tab" data-tab="notify" aria-selected="false">알림</button>
         <button type="button" class="btn ghost" id="logout">로그아웃</button>
@@ -143,11 +164,33 @@ tr.click:hover td { background: var(--bg-gray); }
       </ul>
     </section>
 
+    <section class="card" data-panel="emo" hidden>
+      <h2>감정 응대</h2>
+      <p class="cap" id="emoInfo">TypeSafe Jev로 사용자의 감정을 분류하고, 기준을 넘은 감정에 맞춰 OpenAI 모델이 답합니다.</p>
+      <div class="row" style="margin-top:12px;gap:18px">
+        <label class="check"><input type="checkbox" id="emoEnabled">감정 분류 사용</label>
+        <label class="check"><input type="checkbox" id="callName">답변 앞에 ‘이름님,’ 붙이기</label>
+      </div>
+      <div class="emo-test">
+        <label class="field">바로 분류해 보기 <small>입력하면 0.5초 뒤 지금 표(저장 전 포함)의 기준으로 분류합니다. 저장되지 않아요.</small><textarea id="emoTry" maxlength="500" placeholder="예: 아니 볼륨 계산이 왜 이렇게 안 맞아요? 진짜 화나네"></textarea></label>
+        <div><b>분류 결과</b><span class="status" id="emoTryStatus"></span><div class="bars" id="emoTryBars"></div><div id="emoTryRule"></div></div>
+      </div>
+      <h2 style="margin-top:22px;font-size:17px">응대 기준</h2>
+      <ul class="cap">
+        <li>Jev가 아래 감정 중 하나를 고르고 감정마다 확률을 줍니다. ‘Jev에게 주는 설명’이 분류 기준이 됩니다.</li>
+        <li>확률이 <b>기준</b> 이상인 감정 중 가장 높은 것 하나만 적용합니다. 기준을 0으로 두면 그 감정은 응대를 바꾸지 않습니다.</li>
+        <li>적용되면 <b>첫 문장</b>을 답변 맨 앞(이름 다음)에 붙이고, <b>말투</b>를 모델에 전달합니다. Q&amp;A에 같은 답이 있어도 모델이 그 답을 이 말투로 다시 씁니다.</li>
+        <li>입력하는 동안(타이핑이 0.7초 멈출 때마다) 분류한 흐름과 대화 전체 분위기도 모델에 함께 전달합니다.</li>
+      </ul>
+      <div class="tbl"><table class="labels"><thead><tr><th>감정</th><th>Jev에게 주는 설명</th><th>기준(%)</th><th>첫 문장</th><th>말투</th><th></th></tr></thead><tbody id="labelRows"></tbody></table></div>
+      <div class="row" style="margin-top:12px"><button class="btn" id="addLabel">감정 추가</button><button class="btn primary" id="saveEmo">저장</button><button class="btn danger" id="resetEmo">기본값으로</button><span class="status" id="emoStatus"></span></div>
+    </section>
+
     <section class="card" data-panel="logs" hidden>
       <h2>대화 기록</h2>
-      <p class="cap">최근 대화 300개. 줄을 누르면 내용을 봅니다. 대화 기록은 30일 뒤 자동으로 지워집니다.</p>
-      <div class="row" style="margin-top:10px"><button class="btn" id="reloadLogs">새로고침</button><span class="status" id="logStatus"></span></div>
-      <div class="tbl"><table><thead><tr><th>마지막</th><th>이름</th><th>소속</th><th>질문</th><th>경고</th><th>상태</th></tr></thead><tbody id="logRows"></tbody></table></div>
+      <p class="cap">최근 대화 300개. 줄을 누르면 내용과 감정 분류를 봅니다. 대화 기록은 30일 뒤 자동으로 지워집니다.</p>
+      <div class="row" style="margin-top:10px"><button class="btn" id="reloadLogs">새로고침</button><label class="check" style="margin-left:8px"><input type="checkbox" id="liveLogs">실시간 보기 (3초마다)</label><span class="status" id="logStatus"></span></div>
+      <div class="tbl"><table><thead><tr><th>마지막</th><th>이름</th><th>이메일</th><th>질문</th><th>분위기</th><th>경고</th><th>상태</th></tr></thead><tbody id="logRows"></tbody></table></div>
       <div id="logDetail"></div>
     </section>
 
@@ -167,7 +210,7 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 let token = null; try { token = sessionStorage.getItem('appd-admin'); } catch (e) {}
 let KB = null, CFG = null, DEF = null, cat = null, item = null;
 const MSG_LABEL = { welcome: '시작 인사', offTopic: '사이트와 관련 없는 질문', noInfo: '안내 자료에 없는 질문', injection: '지침·프롬프트를 캐는 질문', duplicate: '같은 질문 반복', throttle: '질문이 너무 빠를 때', gibberish: '의미 없는 글자', tooLong: '질문이 너무 길 때', limit: '질문 수를 다 썼을 때', locked: '대화 종료', blocked: '접속 차단', error: '서버 · 모델 오류' };
-const RULE_LABEL = { maxLen: ['질문 최대 글자 수', '자'], perMinute: ['1분에 할 수 있는 질문 수', '개'], perSession: ['대화 하나의 질문 수', '개'], duplicateFree: ['같은 질문을 이전 답으로 다시 보여 줄 횟수', '번 (넘으면 경고)'], strikeLimit: ['대화를 종료할 경고 수', '번'], lockedPerDay: ['하루에 이만큼 종료되면 24시간 차단', '번'], sessionsPerDay: ['같은 접속에서 하루에 시작할 수 있는 대화 수', '개'], faqThreshold: ['Q&A 그대로 답하는 유사도 (0~1)', '높을수록 엄격'], maxAnswer: ['답변 최대 글자 수', '자'] };
+const RULE_LABEL = { emotionPerSession: ['대화 하나에서 입력 중 감정 분류 횟수', '번'], maxLen: ['질문 최대 글자 수', '자'], perMinute: ['1분에 할 수 있는 질문 수', '개'], perSession: ['대화 하나의 질문 수', '개'], duplicateFree: ['같은 질문을 이전 답으로 다시 보여 줄 횟수', '번 (넘으면 경고)'], strikeLimit: ['대화를 종료할 경고 수', '번'], lockedPerDay: ['하루에 이만큼 종료되면 24시간 차단', '번'], sessionsPerDay: ['같은 접속에서 하루에 시작할 수 있는 대화 수', '개'], faqThreshold: ['Q&A 그대로 답하는 유사도 (0~1)', '높을수록 엄격'], maxAnswer: ['답변 최대 글자 수', '자'] };
 
 async function api(path, opts = {}) {
   const r = await fetch(`/api/admin/${path}`, { ...opts, headers: { 'content-type': 'application/json', authorization: `Bearer ${token}`, ...(opts.headers || {}) } });
@@ -192,6 +235,7 @@ document.querySelectorAll('[data-tab]').forEach((b) => b.onclick = () => {
   document.querySelectorAll('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
   document.querySelectorAll('[data-panel]').forEach((p) => p.hidden = p.dataset.panel !== b.dataset.tab);
   if (b.dataset.tab === 'logs') loadLogs();
+  setLive(b.dataset.tab === 'logs' && $('#liveLogs').checked);
   if (b.dataset.tab === 'notify') loadNotify();
 });
 const status = (id, text, err) => { const s = $(id); s.textContent = text; s.classList.toggle('err', !!err); };
@@ -253,7 +297,8 @@ function drawConfig() {
   $('#guidance').value = CFG.guidance;
 }
 async function saveConfig(statusId) {
-  const next = { messages: {}, limits: {}, guidance: $('#guidance').value };
+  // 다른 탭의 설정(감정 응대 등)이 초기값으로 덮이지 않게 지금 설정 전체를 함께 보냄
+  const next = { ...CFG, messages: {}, limits: {}, guidance: $('#guidance').value };
   document.querySelectorAll('[data-msg]').forEach((t) => next.messages[t.dataset.msg] = t.value);
   document.querySelectorAll('[data-rule]').forEach((i) => next.limits[i.dataset.rule] = Number(i.value));
   try { CFG = await api('config', { method: 'PUT', body: JSON.stringify(next) }); drawConfig(); status(statusId, '저장했어요.'); } catch (x) { status(statusId, x.message, true); }
@@ -261,25 +306,111 @@ async function saveConfig(statusId) {
 $('#saveMsg').onclick = () => saveConfig('#msgStatus');
 $('#saveRules').onclick = () => saveConfig('#rulesStatus');
 
+/* ── 감정 응대 ── */
+let LABELS = [];
+const labelOf = (id, labels = LABELS) => labels.find((l) => l.id === id)?.name || id;
+const pct = (p) => `${Math.round((p || 0) * 100)}%`;
+function bars(probs, labels = LABELS) {
+  const rows = Object.entries(probs || {}).sort((a, b) => b[1] - a[1]);
+  return rows.map(([k, p], i) => `<div class="bar${i === 0 ? ' top' : ''}"><span>${esc(labelOf(k, labels))}</span><i><b style="width:${Math.round(p * 100)}%"></b></i><span>${pct(p)}</span></div>`).join('');
+}
+function drawEmo() {
+  $('#emoEnabled').checked = CFG.emotion.enabled; $('#callName').checked = CFG.callName;
+  LABELS = CFG.emotion.labels.map((l) => ({ ...l }));
+  drawLabels();
+}
+function drawLabels() {
+  $('#labelRows').innerHTML = LABELS.map((l, i) => `<tr data-i="${i}">
+    <td><input type="text" data-k="name" maxlength="20" value="${esc(l.name)}" aria-label="감정 이름"></td>
+    <td><textarea data-k="criteria" maxlength="200" aria-label="${esc(l.name)} 설명">${esc(l.criteria)}</textarea></td>
+    <td><input type="number" data-k="threshold" min="0" max="100" step="5" value="${Math.round(l.threshold * 100)}" aria-label="${esc(l.name)} 기준"></td>
+    <td><textarea data-k="opening" maxlength="120" aria-label="${esc(l.name)} 첫 문장">${esc(l.opening)}</textarea></td>
+    <td><textarea data-k="tone" maxlength="300" aria-label="${esc(l.name)} 말투">${esc(l.tone)}</textarea></td>
+    <td><button type="button" class="btn danger" data-del-label="${i}" aria-label="${esc(l.name)} 삭제">삭제</button></td></tr>`).join('');
+}
+function readLabels() {
+  document.querySelectorAll('#labelRows tr').forEach((tr) => {
+    const l = LABELS[+tr.dataset.i];
+    tr.querySelectorAll('[data-k]').forEach((f) => { l[f.dataset.k] = f.dataset.k === 'threshold' ? Math.min(100, Math.max(0, Number(f.value) || 0)) / 100 : f.value.trim(); });
+  });
+  return LABELS;
+}
+const emoConfig = () => ({ ...CFG, callName: $('#callName').checked, emotion: { enabled: $('#emoEnabled').checked, labels: readLabels() } });
+$('#labelRows').oninput = () => { status('#emoStatus', '저장하지 않은 변경이 있어요.'); tryEmotion(); };
+$('#labelRows').onclick = (e) => {
+  const b = e.target.closest('[data-del-label]'); if (!b) return;
+  readLabels(); if (LABELS.length <= 2) { status('#emoStatus', '감정은 2개 이상 있어야 해요.', true); return; }
+  LABELS.splice(+b.dataset.delLabel, 1); drawLabels(); status('#emoStatus', '저장하지 않은 변경이 있어요.');
+};
+$('#addLabel').onclick = () => { readLabels(); LABELS.push({ id: 'e' + uid(), name: '새 감정', criteria: '이 감정을 고를 때의 설명', threshold: 0.5, opening: '', tone: '' }); drawLabels(); status('#emoStatus', '저장하지 않은 변경이 있어요.'); };
+$('#emoEnabled').onchange = $('#callName').onchange = () => status('#emoStatus', '저장하지 않은 변경이 있어요.');
+$('#saveEmo').onclick = async () => { try { CFG = await api('config', { method: 'PUT', body: JSON.stringify(emoConfig()) }); drawEmo(); drawConfig(); status('#emoStatus', '저장했어요.'); } catch (x) { status('#emoStatus', x.message, true); } };
+$('#resetEmo').onclick = () => { if (!confirm('감정 응대 기준을 기본값으로 바꿀까요? 저장을 눌러야 반영됩니다.')) return; LABELS = DEF.emotion.labels.map((l) => ({ ...l })); $('#callName').checked = DEF.callName; $('#emoEnabled').checked = DEF.emotion.enabled; drawLabels(); status('#emoStatus', '기본값을 불러왔어요. 저장을 눌러야 반영됩니다.'); tryEmotion(); };
+let tryTimer = null, trySeq = 0;
+function tryEmotion() {
+  clearTimeout(tryTimer);
+  const text = $('#emoTry').value.trim();
+  if (!text) { $('#emoTryBars').innerHTML = ''; $('#emoTryRule').innerHTML = ''; status('#emoTryStatus', ''); return; }
+  tryTimer = setTimeout(async () => {
+    const seq = ++trySeq; status('#emoTryStatus', '분류 중…');
+    try {
+      const cfg = emoConfig();
+      const r = await api('emotion', { method: 'POST', body: JSON.stringify({ text, config: cfg }) });
+      if (seq !== trySeq) return;
+      $('#emoTryBars').innerHTML = bars(r.probs, cfg.emotion.labels);
+      const name = '(이름)님,';
+      $('#emoTryRule').innerHTML = r.rule
+        ? `<div class="emo-rule"><b>적용될 응대: ${esc(r.rule.name)} ${pct(r.rule.p)}</b><br>답변 시작: “${esc([cfg.callName ? name : '', r.rule.opening].filter(Boolean).join(' '))} …”<br><span class="cap">말투: ${esc(r.rule.tone || '평소대로')}</span></div>`
+        : `<div class="emo-rule"><b>적용될 응대 없음</b> · 평소 말투로 답합니다.${cfg.callName ? ' 답변은 “(이름)님, …”으로 시작합니다.' : ''}</div>`;
+      status('#emoTryStatus', `신뢰도 ${r.confidence != null ? pct(r.confidence) : '-'} · ${r.model || ''}`);
+    } catch (x) { if (seq === trySeq) status('#emoTryStatus', x.message, true); }
+  }, 500);
+}
+$('#emoTry').oninput = tryEmotion;
+
 /* ── 대화 기록 ── */
 const KIND = { answer: '모델 답변', faq: 'Q&A 답변', repeat: '이전 답 다시', duplicate: '반복 경고', off_topic: '무관 질문', prompt_attack: '지침 캐기', abuse: '이상 사용', gibberish: '의미 없는 글자', too_long: '너무 김', no_info: '자료 없음', error: '오류', throttle: '너무 빠름' };
+const CALM = new Set(['neutral', 'joy']);
+const emoTag = (id, p, labels) => (id ? `<span class="tag ${CALM.has(id) ? 'calm' : 'emo'}">${esc(labelOf(id, labels))}${p != null ? ' ' + pct(p) : ''}</span>` : '');
+const fmtSec = (t) => (t ? new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '');
+let openSess = null, liveTimer = null;
 async function loadLogs() {
   try {
     const rows = await api('sessions');
-    $('#logRows').innerHTML = rows.map((s) => `<tr class="click" data-sess="${esc(s.id)}"><td>${fmt(s.last)}</td><td>${esc(s.name)}</td><td>${esc(s.org)}</td><td>${s.count ?? 0}</td><td>${s.strikes ? `<span class="tag red">${s.strikes}</span>` : 0}</td><td>${s.locked ? '<span class="tag dark">종료</span>' : '<span class="tag">진행</span>'}</td></tr>`).join('') || '<tr><td colspan="6" class="cap">아직 대화가 없어요.</td></tr>';
-    status('#logStatus', `${rows.length}개`);
+    $('#logRows').innerHTML = rows.map((s) => `<tr class="click" data-sess="${esc(s.id)}"><td>${fmt(s.last)}</td><td>${esc(s.name)}</td><td>${esc(s.email || s.org || '')}</td><td>${s.count ?? 0}</td><td>${emoTag(s.mood, s.moodP)}</td><td>${s.strikes ? `<span class="tag red">${s.strikes}</span>` : 0}</td><td>${s.locked ? '<span class="tag dark">종료</span>' : '<span class="tag">진행</span>'}</td></tr>`).join('') || '<tr><td colspan="7" class="cap">아직 대화가 없어요.</td></tr>';
+    status('#logStatus', `${rows.length}개 · ${fmtSec(Date.now())} 기준`);
   } catch (x) { status('#logStatus', x.message, true); }
 }
-$('#reloadLogs').onclick = loadLogs;
+async function showSession(id) {
+  const s = await api(`sessions/${id}`);
+  openSess = id;
+  const L = s.labels || LABELS;
+  const ty = s.typing;
+  // 입력 중 흐름: 메시지 번호별로 묶음
+  const byMsg = {};
+  for (const x of ty?.trail || []) (byMsg[x.msg] ||= []).push(x);
+  const trailOf = (n) => (byMsg[n] || []).map((x) => `<span class="tag ${CALM.has(x.top) ? 'calm' : 'emo'}" title="${fmtSec(x.t)} · ${x.len}자">${esc(labelOf(x.top, L))} ${pct(x.p)}</span>`).join('<span class="cap">→</span>');
+  const pending = (byMsg[s.count] || []).length;
+  $('#logDetail').innerHTML = `<div class="editor"><div class="row"><b>${esc(s.name)}</b><span class="cap">${esc(s.email)}${s.org ? ' · ' + esc(s.org) : ''} · 시작 ${fmt(s.createdAt)} · 질문 ${s.count} · 경고 ${s.strikes}</span><button class="btn danger" id="delSess" data-id="${esc(s.id)}">이 대화 삭제</button></div>
+    <p class="cap">${s.consent ? `동의: ${fmt(s.consent.at)} (문구 버전 ${esc(s.consent.version)})` : '동의 기록 없음 (이전 방식으로 시작한 대화)'}${ty ? ` · 입력 중 감정 분류 ${ty.count}번` : ''}</p>
+    ${s.mood ? `<div><b style="font-size:14px">대화 전체 분위기</b><div class="bars" style="max-width:460px">${bars(s.mood, L)}</div></div>` : ''}
+    ${s.flags?.length ? `<p class="cap">경고: ${s.flags.map((f) => `${KIND[f.kind] || f.kind}(${esc(f.q)})`).join(' · ')}</p>` : ''}
+    <div class="log">${(s.history || []).map((h) => `${trailOf(h.n) ? `<div class="trail"><span class="cap">입력하는 동안:</span>${trailOf(h.n)}</div>` : ''}<div class="q">${esc(h.q)}</div><div class="k" style="justify-self:end">${h.emo ? `감정 ${emoTag(h.emo.top, h.emo.probs?.[h.emo.top], L)} <span class="cap">(${Object.entries(h.emo.probs || {}).sort((a, b) => b[1] - a[1]).slice(1, 3).map(([k, p]) => `${esc(labelOf(k, L))} ${pct(p)}`).join(', ')})</span>` : ''}</div><div class="a">${esc(h.a)}</div><div class="k">${KIND[h.kind] || h.kind}${h.rule ? ` · 응대 기준 적용: ${esc(h.rule.name)} ${pct(h.rule.p)}` : ''} · ${fmt(h.t)}${h.err ? ' · ' + esc(h.err) : ''}</div>`).join('')}
+    ${pending && !s.locked ? `<div class="trail"><span class="cap">지금 입력 중:</span>${trailOf(s.count)}</div>` : ''}</div></div>`;
+  $('#delSess').onclick = async (ev) => { if (!confirm('이 대화 기록을 삭제할까요?')) return; await api(`sessions/${ev.target.dataset.id}`, { method: 'DELETE' }); $('#logDetail').innerHTML = ''; openSess = null; loadLogs(); };
+}
+function setLive(on) {
+  clearInterval(liveTimer); liveTimer = null;
+  if (on) liveTimer = setInterval(async () => {
+    if (document.hidden) return;
+    try { await loadLogs(); if (openSess) await showSession(openSess); } catch (x) { /* 다음에 다시 */ }
+  }, 3000);
+}
+$('#liveLogs').onchange = () => setLive($('#liveLogs').checked);
+$('#reloadLogs').onclick = async () => { await loadLogs(); if (openSess) showSession(openSess).catch(() => {}); };
 $('#logRows').onclick = async (e) => {
   const tr = e.target.closest('[data-sess]'); if (!tr) return;
-  try {
-    const s = await api(`sessions/${tr.dataset.sess}`);
-    $('#logDetail').innerHTML = `<div class="editor"><div class="row"><b>${esc(s.name)}</b><span class="cap">${esc(s.org)} ${esc(s.email)} · 시작 ${fmt(s.createdAt)} · 질문 ${s.count} · 경고 ${s.strikes}</span><button class="btn danger" id="delSess" data-id="${esc(s.id)}">이 대화 삭제</button></div>
-      ${s.flags?.length ? `<p class="cap">경고: ${s.flags.map((f) => `${KIND[f.kind] || f.kind}(${esc(f.q)})`).join(' · ')}</p>` : ''}
-      <div class="log">${(s.history || []).map((h) => `<div class="q">${esc(h.q)}</div><div class="a">${esc(h.a)}</div><div class="k">${KIND[h.kind] || h.kind} · ${fmt(h.t)}${h.err ? ' · ' + esc(h.err) : ''}</div>`).join('')}</div></div>`;
-    $('#delSess').onclick = async (ev) => { if (!confirm('이 대화 기록을 삭제할까요?')) return; await api(`sessions/${ev.target.dataset.id}`, { method: 'DELETE' }); $('#logDetail').innerHTML = ''; loadLogs(); };
-  } catch (x) { status('#logStatus', x.message, true); }
+  try { await showSession(tr.dataset.sess); } catch (x) { status('#logStatus', x.message, true); }
 };
 
 /* ── 알림 ── */
@@ -296,10 +427,11 @@ async function start() {
   try {
     const [kb, c] = await Promise.all([api('kb'), api('config')]);
     KB = kb; CFG = c.config; DEF = c.defaults;
-    $('#modelInfo').textContent = `모델 ${c.model}${c.hasKey ? '' : ' · API 키 없음'}`;
+    $('#modelInfo').textContent = `답변 ${c.model}${c.hasKey ? '' : ' (API 키 없음)'} · 감정 ${c.emotionModel}${c.hasEmotionKey ? '' : ' (API 키 없음)'}`;
+    $('#emoInfo').textContent = `TypeSafe ${c.emotionModel}로 사용자의 감정을 분류하고, 기준을 넘은 감정에 맞춰 OpenAI ${c.model}이 답합니다.${c.hasEmotionKey ? '' : ' 지금은 TypeSafe API 키(typesafe_ai_api_key)가 없어 분류하지 않습니다.'}`;
     cat = KB.categories[0]?.id;
     $('#login').hidden = true; $('#app').hidden = false;
-    drawCats(); drawConfig();
+    drawCats(); drawConfig(); drawEmo();
   } catch (x) { $('#loginErr').textContent = x.message; }
 }
 if (token) start();

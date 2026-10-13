@@ -6,6 +6,13 @@
       "runtimeExecutable": "python",
       "runtimeArgs": [".claude/serve.py"],
       "port": 5173
+    },
+    {
+      "name": "chat-test-local",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["C:/Users/susan726/Documents/my-first-worker/node_modules/wrangler/bin/wrangler.js", "dev", "-c", "wrangler.test.jsonc", "--port", "8787", "--ip", "127.0.0.1"],
+      "port": 8787,
+      "url": "http://127.0.0.1:8787"
     }
   ]
 }

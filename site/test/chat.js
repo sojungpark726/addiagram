@@ -16,8 +16,10 @@
     <form class="cb-foot" id="cbFoot" hidden><textarea id="cbInput" rows="1" placeholder="질문을 입력하세요" aria-label="질문"></textarea><button type="submit" class="cb-send" id="cbSend">보내기</button><span class="cb-meta" id="cbMeta"></span></form>`);
   document.body.append(btn, panel);
   const body = panel.querySelector('#cbBody'), foot = panel.querySelector('#cbFoot'), input = panel.querySelector('#cbInput'), send = panel.querySelector('#cbSend'), meta = panel.querySelector('#cbMeta');
-  let state = load(); // { sessionId, msgs: [{who, text, warn}], locked, remaining }
+  let state = load(); // { sessionId, name, msgs: [{who, text, warn}], locked, remaining }
   let maxLen = 300;
+  let consent = { version: '', text: '이름 · 이메일과 대화 내용을 관리자 대화 기록에 저장하고, 입력하는 글의 감정을 분석해 답변 말투에 반영하는 데 동의합니다.' };
+  let emotionOn = false;
 
   const add = (who, text, warn) => {
     const m = el('div', { class: `cb-msg ${who}${warn ? ' warn' : ''}` });
@@ -40,35 +42,62 @@
   function renderForm() {
     foot.hidden = true;
     const f = el('form', { class: 'cb-form', novalidate: '' }, `
-      <p>대화를 시작하기 전에 알려 주세요.</p>
+      <p>대화를 시작하기 전에 알려 주세요. 이름을 불러 드리며 안내할게요.</p>
       <label>이름 (필수)<input name="name" maxlength="30" autocomplete="name" required></label>
-      <label>소속 (선택)<input name="org" maxlength="40" autocomplete="organization"></label>
-      <label>이메일 (선택)<input name="email" type="email" maxlength="80" autocomplete="email"></label>
-      <p class="cb-note">입력한 이름 · 소속 · 이메일과 대화 내용은 관리자에게 전달되고 30일 동안 보관됩니다. 부정 사용을 막기 위해 접속 정보는 암호화한 값으로만 잠시 보관합니다. 사이트와 관련 없는 질문이나 같은 질문 반복이 쌓이면 대화가 종료될 수 있어요.</p>
+      <label>이메일 (필수)<input name="email" type="email" maxlength="80" autocomplete="email" required></label>
+      <label class="cb-consent"><input type="checkbox" name="consent" required><span><b>(필수)</b> ${esc(consent.text)}</span></label>
+      <p class="cb-note">부정 사용을 막기 위해 접속 정보는 암호화한 값으로만 잠시 보관합니다. 사이트와 관련 없는 질문이나 같은 질문 반복이 쌓이면 대화가 종료될 수 있어요.</p>
       <span class="cb-err" role="alert"></span>
-      <button type="submit">대화 시작</button>`);
+      <button type="submit" disabled>대화 시작</button>`);
     body.appendChild(f);
+    const agree = f.querySelector('input[name="consent"]'), startBtn = f.querySelector('button');
+    agree.addEventListener('change', () => { startBtn.disabled = !agree.checked; });
     f.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const err = f.querySelector('.cb-err'), b = f.querySelector('button');
-      const data = Object.fromEntries(new FormData(f));
-      if (!String(data.name || '').trim()) { err.textContent = '이름을 입력해 주세요.'; return; }
+      const err = f.querySelector('.cb-err'), b = startBtn;
+      const nameIn = f.querySelector('input[name="name"]'), emailIn = f.querySelector('input[name="email"]');
+      const name = nameIn.value.trim(), email = emailIn.value.trim();
+      if (!name) { err.textContent = '이름을 입력해 주세요.'; nameIn.focus(); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = email ? '이메일 형식이 아닙니다.' : '이메일을 입력해 주세요.'; emailIn.focus(); return; }
+      if (!agree.checked) { err.textContent = '동의해야 대화를 시작할 수 있어요.'; return; }
       b.disabled = true; err.textContent = '';
       try {
-        const r = await fetch(`${API}/start`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) });
+        const r = await fetch(`${API}/start`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name, email, consent: true, consentVersion: consent.version }) });
         const j = await r.json();
         if (!r.ok || j.blocked) { err.textContent = j.error || j.message || '대화를 시작할 수 없어요.'; b.disabled = false; return; }
-        state = { sessionId: j.sessionId, msgs: [{ who: 'bot', text: j.welcome }], locked: false, remaining: null };
+        state = { sessionId: j.sessionId, name: j.name, msgs: [{ who: 'bot', text: j.welcome }], locked: false, remaining: null };
         save(state); render(); input.focus();
       } catch (x) { err.textContent = '연결이 원활하지 않아요. 잠시 후 다시 시도해 주세요.'; b.disabled = false; }
     });
     setTimeout(() => f.querySelector('input[name="name"]').focus(), 50);
   }
+  // 입력하는 동안 감정 분류: 타이핑이 0.7초 멈추면 지금까지 쓴 글을 서버로 보냄 (한 번에 하나씩, 결과는 화면에 보이지 않음)
+  let emoTimer = null, emoBusy = null, emoLast = '';
+  const sendEmotion = (text) => {
+    if (!emotionOn || !state?.sessionId || state.locked) return;
+    text = text.trim();
+    if (text.replace(/\s+/g, '').length < 2 || text === emoLast || text.length > maxLen) return;
+    if (emoBusy) return; // 앞 요청이 끝나면 다음 멈춤 때 다시 보냄
+    emoLast = text;
+    emoBusy = fetch(`${API}/emotion`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ sessionId: state.sessionId, text }) })
+      .catch(() => {}).finally(() => {
+        emoBusy = null;
+        // 기다리는 동안 글이 바뀌었으면 한 번 더 (서버는 같은 대화에서 1초에 한 번만 받음)
+        if (input.value.trim() !== emoLast) { clearTimeout(emoTimer); emoTimer = setTimeout(() => sendEmotion(input.value), 1000); }
+      });
+  };
+  input.addEventListener('input', () => {
+    clearTimeout(emoTimer);
+    emoTimer = setTimeout(() => sendEmotion(input.value), 700);
+  });
   async function ask(text) {
+    clearTimeout(emoTimer);
     state.msgs.push({ who: 'me', text }); add('me', text);
     const wait = el('div', { class: 'cb-msg bot wait', 'aria-label': '답변을 준비하는 중' }, '<i></i><i></i><i></i>');
     body.appendChild(wait); body.scrollTop = body.scrollHeight;
     input.disabled = send.disabled = true;
+    if (emoBusy) await emoBusy; // 입력 중 분류가 끝난 뒤 보내야 서버가 그 결과를 이어서 씀
+    clearTimeout(emoTimer); emoLast = '';
     try {
       const r = await fetch(`${API}/message`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ sessionId: state.sessionId, message: text }) });
       const j = await r.json();
@@ -101,5 +130,13 @@
   btn.addEventListener('click', () => toggle(!panel.classList.contains('open')));
   panel.querySelector('.cb-x').addEventListener('click', () => { toggle(false); btn.focus(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel.classList.contains('open')) { toggle(false); btn.focus(); } });
-  fetch(`${API}/config`).then((r) => r.json()).then((c) => { if (c.maxLen) maxLen = c.maxLen; }).catch(() => {});
+  fetch(`${API}/config`).then((r) => r.json()).then((c) => {
+    if (c.maxLen) maxLen = c.maxLen;
+    if (c.consent?.text) {
+      consent = c.consent;
+      const span = panel.querySelector('.cb-consent span');
+      if (span) span.innerHTML = `<b>(필수)</b> ${esc(consent.text)}`;
+    }
+    emotionOn = !!c.emotion;
+  }).catch(() => {});
 })();
