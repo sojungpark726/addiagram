@@ -11,7 +11,7 @@
   const btn = el('button', { type: 'button', class: 'cb-btn', 'aria-label': '안내 챗봇 열기', 'aria-expanded': 'false', 'aria-controls': 'cbPanel' },
     '<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 6.5A3.5 3.5 0 0 1 8.5 3h11A3.5 3.5 0 0 1 23 6.5v8a3.5 3.5 0 0 1-3.5 3.5H12l-5 4.5V18A3.5 3.5 0 0 1 5 14.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="11.5" y="7.5" width="5" height="5" fill="currentColor" transform="rotate(45 14 10)"/></svg>');
   const panel = el('section', { class: 'cb-panel', id: 'cbPanel', role: 'dialog', 'aria-label': '안내 챗봇', 'aria-modal': 'false' }, `
-    <div class="cb-head"><span class="cb-dia" aria-hidden="true"></span><div><b>안내 챗봇</b><br><small>App Design 워크플로우 · 테스트</small></div><button type="button" class="cb-x" aria-label="챗봇 닫기">✕</button></div>
+    <div class="cb-head"><span class="cb-dia" aria-hidden="true"></span><div><b>안내 챗봇</b><br><small>App Design 워크플로우${location.pathname.startsWith('/test/') ? ' · 테스트' : ''}</small></div><button type="button" class="cb-x" aria-label="챗봇 닫기">✕</button></div>
     <div class="cb-body" id="cbBody" aria-live="polite"></div>
     <form class="cb-foot" id="cbFoot" hidden><textarea id="cbInput" rows="1" placeholder="질문을 입력하세요" aria-label="질문"></textarea><button type="submit" class="cb-send" id="cbSend">보내기</button><span class="cb-meta" id="cbMeta"></span></form>`);
   document.body.append(btn, panel);
